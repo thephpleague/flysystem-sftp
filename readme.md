@@ -8,6 +8,7 @@
 [![Packagist Version](https://img.shields.io/packagist/v/league/flysystem-sftp.svg?style=flat-square)](https://packagist.org/packages/league/flysystem-sftp)
 [![Total Downloads](https://img.shields.io/packagist/dt/league/flysystem-sftp.svg?style=flat-square)](https://packagist.org/packages/league/flysystem-sftp)
 
+This adapter uses phpseclib to provide a SFTP adapter for Flysystem.
 
 ## Installation
 
