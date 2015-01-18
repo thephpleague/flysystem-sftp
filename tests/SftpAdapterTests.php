@@ -1,6 +1,5 @@
 <?php
 
-use League\Flysystem\Cache\Noop;
 use League\Flysystem\Sftp\SftpAdapter as Sftp;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
@@ -21,7 +20,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
         $mock->shouldReceive('__toString')->andReturn('Net_SFTP');
         $mock->shouldReceive('disconnect');
         $adapter->setNetSftpConnection($mock);
-        $filesystem = new Filesystem($adapter, new Noop());
+        $filesystem = new Filesystem($adapter);
 
         return [
             [$filesystem, $adapter, $mock],
