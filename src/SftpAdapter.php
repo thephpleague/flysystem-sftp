@@ -201,10 +201,10 @@ class SftpAdapter extends AbstractFtpAdapter
         $permissions = $this->normalizePermissions($object['permissions']);
 
         return [
-            'path' => $path,
-            'size' => $object['size'],
-            'timestamp' => $object['mtime'],
-            'type' => ($object['type'] === 1 ? 'file' : 'dir'),
+            'path'       => $path,
+            'size'       => $object['size'],
+            'timestamp'  => $object['mtime'],
+            'type'       => ($object['type'] === 1 ? 'file' : 'dir'),
             'visibility' => $permissions & 0044 ? AdapterInterface::VISIBILITY_PUBLIC : AdapterInterface::VISIBILITY_PRIVATE,
         ];
     }
