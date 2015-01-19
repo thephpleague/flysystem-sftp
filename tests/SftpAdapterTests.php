@@ -1,8 +1,8 @@
 <?php
 
-use League\Flysystem\Sftp\SftpAdapter as Sftp;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
+use League\Flysystem\Sftp\SftpAdapter as Sftp;
 
 class SftpTests extends PHPUnit_Framework_TestCase
 {
@@ -33,9 +33,9 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function testHas($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type' => NET_SFTP_TYPE_DIRECTORY,
-            'mtime' => time(),
-            'size' => 20,
+            'type'        => NET_SFTP_TYPE_DIRECTORY,
+            'mtime'       => time(),
+            'size'        => 20,
             'permissions' => 0777,
         ]);
 
@@ -71,9 +71,9 @@ class SftpTests extends PHPUnit_Framework_TestCase
     {
         $mock->shouldReceive('delete')->andReturn(true, false);
         $mock->shouldReceive('stat')->andReturn([
-            'type' => 1,
-            'mtime' => time(),
-            'size' => 20,
+            'type'        => 1,
+            'mtime'       => time(),
+            'size'        => 20,
             'permissions' => 0777,
         ]);
         $this->assertTrue($filesystem->delete('something'));
@@ -87,9 +87,9 @@ class SftpTests extends PHPUnit_Framework_TestCase
     {
         $mock->shouldReceive('put')->andReturn(true, false);
         $mock->shouldReceive('stat')->andReturn([
-            'type' => NET_SFTP_TYPE_DIRECTORY,
-            'mtime' => time(),
-            'size' => 20,
+            'type'        => NET_SFTP_TYPE_DIRECTORY,
+            'mtime'       => time(),
+            'size'        => 20,
             'permissions' => 0777,
         ]);
         $this->assertTrue($filesystem->update('something', 'something'));
@@ -122,9 +122,9 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function testRename($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type' => NET_SFTP_TYPE_DIRECTORY,
-            'mtime' => time(),
-            'size' => 20,
+            'type'        => NET_SFTP_TYPE_DIRECTORY,
+            'mtime'       => time(),
+            'size'        => 20,
             'permissions' => 0777,
         ], false);
         $mock->shouldReceive('rename')->andReturn(true);
@@ -148,19 +148,19 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function testListContents($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('rawlist')->andReturn(false, [
-            '.' => [],
+            '.'       => [],
             'dirname' => [
-                'type' => NET_SFTP_TYPE_DIRECTORY,
-                'mtime' => time(),
-                'size' => 20,
+                'type'        => NET_SFTP_TYPE_DIRECTORY,
+                'mtime'       => time(),
+                'size'        => 20,
                 'permissions' => 0777,
             ],
         ], [
-            '..' => [],
+            '..'      => [],
             'dirname' => [
-                'type' => 1,
-                'mtime' => time(),
-                'size' => 20,
+                'type'        => 1,
+                'mtime'       => time(),
+                'size'        => 20,
                 'permissions' => 0777,
             ],
         ]);
@@ -190,9 +190,9 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function testMetaMethods($filesystem, $adapter, $mock, $method, $type)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type' => NET_SFTP_TYPE_DIRECTORY,
-            'mtime' => time(),
-            'size' => 20,
+            'type'        => NET_SFTP_TYPE_DIRECTORY,
+            'mtime'       => time(),
+            'size'        => 20,
             'permissions' => 0777,
         ]);
         $result = $filesystem->{$method}(uniqid().'object.ext');
@@ -205,9 +205,9 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function testGetVisibility($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type' => NET_SFTP_TYPE_DIRECTORY,
-            'mtime' => time(),
-            'size' => 20,
+            'type'        => NET_SFTP_TYPE_DIRECTORY,
+            'mtime'       => time(),
+            'size'        => 20,
             'permissions' => 0777,
         ]);
         $result = $adapter->getVisibility(uniqid().'object.ext');
@@ -223,9 +223,9 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function testGetTimestamp($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type' => NET_SFTP_TYPE_DIRECTORY,
-            'mtime' => $time = time(),
-            'size' => 20,
+            'type'        => NET_SFTP_TYPE_DIRECTORY,
+            'mtime'       => $time = time(),
+            'size'        => 20,
             'permissions' => 0777,
         ]);
         $result = $adapter->getTimestamp('object.ext');
@@ -251,9 +251,9 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function testRead($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type' => 1,
-            'mtime' => time(),
-            'size' => 20,
+            'type'        => 1,
+            'mtime'       => time(),
+            'size'        => 20,
             'permissions' => 0777,
         ]);
         $mock->shouldReceive('get')->andReturn('file contents', false);
@@ -269,9 +269,9 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function testGetMimetype($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type' => 1,
-            'mtime' => time(),
-            'size' => 20,
+            'type'        => 1,
+            'mtime'       => time(),
+            'size'        => 20,
             'permissions' => 0777,
         ]);
 
