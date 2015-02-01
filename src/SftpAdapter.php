@@ -6,7 +6,7 @@ use Crypt_RSA;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\AbstractFtpAdapter;
 use League\Flysystem\Adapter\Polyfill\StreamedCopyTrait;
-use League\Flysystem\Adapter\Polyfill\StreamedTrait;
+use League\Flysystem\Adapter\Polyfill\StreamedReadingTrait;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
@@ -16,7 +16,7 @@ use RuntimeException;
 
 class SftpAdapter extends AbstractFtpAdapter
 {
-    use StreamedTrait;
+    use StreamedReadingTrait;
     use StreamedCopyTrait;
 
     /**
@@ -222,6 +222,35 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     public function write($path, $contents, Config $config)
     {
+        if ($this->upload($path, $contents, $config) === false) {
+            return false;
+        }
+
+        return compact('contents', 'visibility', 'path');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function writeStream($path, $resource, Config $config)
+    {
+        if ($this->upload($path, $resource, $config) === false) {
+            return false;
+        }
+
+        return compact('visibility', 'path');
+    }
+
+    /**
+     * Upload a file.
+     *
+     * @param string          $path
+     * @param string|resource $contents
+     * @param Config          $config
+     * @return bool
+     */
+    public function upload($path, $contents, Config $config)
+    {
         $connection = $this->getConnection();
         $this->ensureDirectory(Util::dirname($path));
         $config = Util::ensureConfig($config);
@@ -234,7 +263,7 @@ class SftpAdapter extends AbstractFtpAdapter
             $this->setVisibility($path, $visibility);
         }
 
-        return compact('contents', 'visibility', 'path');
+        return true;
     }
 
     /**
@@ -257,6 +286,14 @@ class SftpAdapter extends AbstractFtpAdapter
     public function update($path, $contents, Config $config)
     {
         return $this->write($path, $contents, $config);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateStream($path, $contents, Config $config)
+    {
+        return $this->writeStream($path, $contents, $config);
     }
 
     /**

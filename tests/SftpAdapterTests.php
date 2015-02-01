@@ -67,6 +67,20 @@ class SftpTests extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider adapterProvider
      */
+    public function testWriteStream($filesystem, $adapter, $mock)
+    {
+        $stream = tmpfile();
+        $mock->shouldReceive('put')->andReturn(true, false);
+        $mock->shouldReceive('stat')->andReturn(false);
+        $mock->shouldReceive('chmod')->andReturn(true);
+        $this->assertTrue($filesystem->writeStream('something', $stream, ['visibility' => 'public']));
+        $this->assertFalse($filesystem->writeStream('something_else.txt', $stream));
+        fclose($stream);
+    }
+
+    /**
+     * @dataProvider adapterProvider
+     */
     public function testDelete($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('delete')->andReturn(true, false);
@@ -94,6 +108,24 @@ class SftpTests extends PHPUnit_Framework_TestCase
         ]);
         $this->assertTrue($filesystem->update('something', 'something'));
         $this->assertFalse($filesystem->update('something_else.txt', 'else'));
+    }
+
+    /**
+     * @dataProvider adapterProvider
+     */
+    public function testUpdateStream(FilesystemInterface $filesystem, $adapter, $mock)
+    {
+        $stream = tmpfile();
+        $mock->shouldReceive('put')->andReturn(true, false);
+        $mock->shouldReceive('stat')->andReturn([
+            'type'        => NET_SFTP_TYPE_DIRECTORY,
+            'mtime'       => time(),
+            'size'        => 20,
+            'permissions' => 0777,
+        ]);
+        $this->assertTrue($filesystem->updateStream('something', $stream));
+        $this->assertFalse($filesystem->updateStream('something_else.txt', $stream));
+        fclose($stream);
     }
 
     /**
