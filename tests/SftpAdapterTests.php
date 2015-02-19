@@ -391,4 +391,36 @@ class SftpTests extends PHPUnit_Framework_TestCase
         $mock->shouldReceive('chdir')->with('/root/')->andReturn(false);
         $adapter->connect();
     }
+
+    /**
+     * @dataProvider adapterProvider
+     */
+    public function testListContentsDir($filesystem, $adapter, $mock)
+    {
+        $mock
+            ->shouldReceive('rawlist')
+            ->andReturn(
+                [
+                    'dirname' =>
+                        [
+                        'type'        => NET_SFTP_TYPE_DIRECTORY,
+                        'mtime'       => time(),
+                        'permissions' => 0777,
+                        'filename'    => 'dirname'
+                        ],
+                    'filename' =>
+                        [
+                        'type'        => 1,
+                        'mtime'       => time(),
+                        'size'        => 20,
+                        'permissions' => 0777,
+                        'filename'    => 'filename'
+                        ],
+                ]
+            );
+
+        $listing = $filesystem->listContents('');
+        $this->assertInternalType('array', $listing);
+        $this->assertCount(2, $listing);
+    }
 }
