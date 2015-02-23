@@ -199,14 +199,17 @@ class SftpAdapter extends AbstractFtpAdapter
     protected function normalizeListingObject($path, array $object)
     {
         $permissions = $this->normalizePermissions($object['permissions']);
+        $type = ($object['type'] === 1) ? 'file' : 'dir' ;
+        $timestamp = $object['mtime'];
 
-        return [
-            'path'       => $path,
-            'size'       => $object['size'],
-            'timestamp'  => $object['mtime'],
-            'type'       => ($object['type'] === 1 ? 'file' : 'dir'),
-            'visibility' => $permissions & 0044 ? AdapterInterface::VISIBILITY_PUBLIC : AdapterInterface::VISIBILITY_PRIVATE,
-        ];
+        if ($type === 'dir') {
+            return compact('path', 'timestamp', 'type');
+        }
+
+        $visibility = $permissions & 0044 ? AdapterInterface::VISIBILITY_PUBLIC : AdapterInterface::VISIBILITY_PRIVATE;
+        $size = (int) $object['size'];
+
+        return compact('path', 'timestamp', 'type', 'visibility', 'size');
     }
 
     /**
