@@ -390,10 +390,6 @@ class SftpAdapter extends AbstractFtpAdapter
     {
         $connection = $this->getConnection();
 
-        if (! isset($this->directoryPerm)) {
-            throw new InvalidArgumentException('Unknown directory permissions');
-        }
-
         if (! $connection->mkdir($dirname, $this->directoryPerm, true)) {
             return false;
         }
