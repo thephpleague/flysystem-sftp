@@ -30,6 +30,7 @@ $adapter = new SftpAdapter([
     'privateKey' => 'path/to/or/contents/of/privatekey',
     'root' => '/path/to/root',
     'timeout' => 10,
+    'directoryPerm' => 0755
 ]);
 
 $filesystem = new Filesystem($adapter);
