@@ -32,12 +32,17 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * @var array
      */
-    protected $configurable = ['host', 'port', 'username', 'password', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic'];
+    protected $configurable = ['host', 'port', 'username', 'password', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic', 'directoryPerm'];
 
     /**
      * @var array
      */
     protected $statMap = ['mtime' => 'timestamp', 'size' => 'size'];
+
+    /**
+     * @var int
+     */
+    protected $directoryPerm = 0744;
 
     /**
      * Prefix a path.
@@ -385,7 +390,7 @@ class SftpAdapter extends AbstractFtpAdapter
     {
         $connection = $this->getConnection();
 
-        if (! $connection->mkdir($dirname, 0744, true)) {
+        if (! $connection->mkdir($dirname, $this->directoryPerm, true)) {
             return false;
         }
 
