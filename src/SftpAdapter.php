@@ -71,6 +71,30 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
+     * Set permissions for new directory
+     *
+     * @param int $directoryPerm
+     *
+     * @return $this
+     */
+    public function setDirectoryPerm($directoryPerm)
+    {
+        $this->directoryPerm = $directoryPerm;
+
+        return $this;
+    }
+
+    /**
+     * Get permissions for new directory
+     *
+     * @return int
+     */
+    public function getDirectoryPerm()
+    {
+        return $this->directoryPerm;
+    }
+
+    /**
      * Inject the Net_SFTP instance.
      *
      * @param Net_SFTP $connection
