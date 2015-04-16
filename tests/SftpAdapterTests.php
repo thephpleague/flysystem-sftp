@@ -272,7 +272,10 @@ class SftpTests extends PHPUnit_Framework_TestCase
      */
     public function testCreateDir($filesystem, $adapter, $mock)
     {
-        $mock->shouldReceive('mkdir')->andReturn(true, false);
+        $directoryPerm = 12345;
+        $adapter->setDirectoryPerm($directoryPerm);
+        $mock->shouldReceive('mkdir')->once()->with('dirname', $directoryPerm, true)->andReturn(true);
+        $mock->shouldReceive('mkdir')->once()->with('dirname_fails', $directoryPerm, true)->andReturn(false);
         $this->assertTrue($filesystem->createDir('dirname'));
         $this->assertFalse($filesystem->createDir('dirname_fails'));
     }
@@ -333,6 +336,16 @@ class SftpTests extends PHPUnit_Framework_TestCase
         $this->assertEquals($adapter, $adapter->setPrivateKey($key));
         $this->assertInstanceOf('Crypt_RSA', $adapter->getPrivateKey());
         @unlink($key);
+    }
+
+    /**
+     * @dataProvider  adapterProvider
+     */
+    public function testDirectoryPermSetGet($filesystem, $adapter, $mock)
+    {
+        $directoryPerm = 12345;
+        $this->assertEquals($adapter, $adapter->setDirectoryPerm($directoryPerm));
+        $this->assertEquals($directoryPerm, $adapter->getDirectoryPerm());
     }
 
     /**
