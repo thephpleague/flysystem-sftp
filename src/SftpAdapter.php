@@ -315,6 +315,24 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * {@inheritdoc}
      */
+    public function readStream($path)
+    {
+        $stream = tmpfile();
+        $connection = $this->getConnection();
+
+        if ($connection->get($path, $stream) === false) {
+            fclose($stream);
+            return false;
+        }
+
+        rewind($stream);
+
+        return compact('stream');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function update($path, $contents, Config $config)
     {
         return $this->write($path, $contents, $config);
