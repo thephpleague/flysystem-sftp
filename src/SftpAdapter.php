@@ -16,7 +16,6 @@ use RuntimeException;
 
 class SftpAdapter extends AbstractFtpAdapter
 {
-    use StreamedReadingTrait;
     use StreamedCopyTrait;
 
     /**
