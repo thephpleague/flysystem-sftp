@@ -301,6 +301,22 @@ class SftpTests extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider  adapterProvider
      */
+    public function testReadStream($filesystem, $adapter, $mock)
+    {
+        $stream = tmpfile();
+        fwrite($stream, 'something');
+        $mock->shouldReceive('get')->andReturn($stream, false);
+        $result = $adapter->readStream('something');
+        $this->assertInternalType('array', $result);
+        $this->assertArrayHasKey('stream', $result);
+        $this->assertInternalType('resource', $result['stream']);
+        $this->assertFalse($adapter->readStream('something'));
+        fclose($stream);
+    }
+
+    /**
+     * @dataProvider  adapterProvider
+     */
     public function testGetMimetype($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
