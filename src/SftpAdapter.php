@@ -6,7 +6,6 @@ use Crypt_RSA;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\AbstractFtpAdapter;
 use League\Flysystem\Adapter\Polyfill\StreamedCopyTrait;
-use League\Flysystem\Adapter\Polyfill\StreamedReadingTrait;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
@@ -249,7 +248,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function write($path, $contents, Config $config)
     {
@@ -261,7 +260,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function writeStream($path, $resource, Config $config)
     {
@@ -298,7 +297,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function read($path)
     {
@@ -312,7 +311,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function readStream($path)
     {
@@ -330,7 +329,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function update($path, $contents, Config $config)
     {
@@ -338,7 +337,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function updateStream($path, $contents, Config $config)
     {
@@ -346,7 +345,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete($path)
     {
@@ -356,7 +355,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function rename($path, $newpath)
     {
@@ -366,7 +365,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteDir($dirname)
     {
@@ -376,7 +375,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function has($path)
     {
@@ -384,7 +383,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getMetadata($path)
     {
@@ -403,7 +402,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTimestamp($path)
     {
@@ -411,7 +410,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getMimetype($path)
     {
@@ -425,7 +424,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function createDir($dirname, Config $config)
     {
@@ -439,7 +438,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getVisibility($path)
     {
@@ -447,7 +446,7 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setVisibility($path, $visibility)
     {
@@ -460,5 +459,17 @@ class SftpAdapter extends AbstractFtpAdapter
         $connection = $this->getConnection();
 
         return $connection->chmod($this->{'perm'.$visibility}, $path);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isConnected()
+    {
+        if ($this->connection instanceof Net_SFTP && $this->connection->isConnected()) {
+            return true;
+        }
+
+        return false;
     }
 }
