@@ -2,7 +2,6 @@
 
 namespace League\Flysystem\Sftp;
 
-use Crypt_RSA;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\AbstractFtpAdapter;
 use League\Flysystem\Adapter\Polyfill\StreamedCopyTrait;
@@ -148,7 +147,7 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * Get the password, either the private key or a plain text password.
      *
-     * @return Crypt_RSA|string
+     * @return RSA|string
      */
     public function getPassword()
     {
@@ -162,7 +161,7 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * Get the private get with the password or private key contents.
      *
-     * @return Crypt_RSA
+     * @return RSA
      */
     public function getPrivateKey()
     {
@@ -286,7 +285,7 @@ class SftpAdapter extends AbstractFtpAdapter
         $this->ensureDirectory(Util::dirname($path));
         $config = Util::ensureConfig($config);
 
-        if (! $connection->put($path, $contents, NET_SFTP_STRING)) {
+        if (! $connection->put($path, $contents, SFTP::SOURCE_STRING)) {
             return false;
         }
 
