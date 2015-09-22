@@ -10,7 +10,7 @@ use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
 use LogicException;
-use Net_SFTP;
+use phpseclib\Net\SFTP;
 use RuntimeException;
 
 class SftpAdapter extends AbstractFtpAdapter
@@ -93,13 +93,13 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * Inject the Net_SFTP instance.
+     * Inject the SFTP instance.
      *
-     * @param Net_SFTP $connection
+     * @param SFTP $connection
      *
      * @return $this
      */
-    public function setNetSftpConnection(Net_SFTP $connection)
+    public function setNetSftpConnection(SFTP $connection)
     {
         $this->connection = $connection;
 
@@ -111,7 +111,7 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     public function connect()
     {
-        $this->connection = $this->connection ?: new Net_SFTP($this->host, $this->port, $this->timeout);
+        $this->connection = $this->connection ?: new SFTP($this->host, $this->port, $this->timeout);
         $this->login();
         $this->setConnectionRoot();
     }
@@ -207,7 +207,7 @@ class SftpAdapter extends AbstractFtpAdapter
             $path = empty($directory) ? $filename : ($directory.'/'.$filename);
             $result[] = $this->normalizeListingObject($path, $object);
 
-            if ($recursive && $object['type'] === NET_SFTP_TYPE_DIRECTORY) {
+            if ($recursive && $object['type'] === SFTP_TYPE_DIRECTORY) {
                 $result = array_merge($result, $this->listDirectoryContents($path));
             }
         }
@@ -466,7 +466,7 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     public function isConnected()
     {
-        if ($this->connection instanceof Net_SFTP && $this->connection->isConnected()) {
+        if ($this->connection instanceof SFTP && $this->connection->isConnected()) {
             return true;
         }
 
