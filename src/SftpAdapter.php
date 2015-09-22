@@ -11,6 +11,7 @@ use League\Flysystem\Config;
 use League\Flysystem\Util;
 use LogicException;
 use phpseclib\Net\SFTP;
+use phpseclib\Crypt\RSA;
 use RuntimeException;
 
 class SftpAdapter extends AbstractFtpAdapter
@@ -169,7 +170,7 @@ class SftpAdapter extends AbstractFtpAdapter
             $this->privatekey = file_get_contents($this->privatekey);
         }
 
-        $key = new Crypt_RSA();
+        $key = new RSA();
 
         if ($this->password) {
             $key->setPassword($this->password);

@@ -17,7 +17,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function adapterProvider()
     {
         $adapter = new Sftp(['username' => 'test', 'password' => 'test']);
-        $mock = Mockery::mock('Net_SFTP');
+        $mock = Mockery::mock('phpseclib\Net\SFTP');
         $mock->shouldReceive('__toString')->andReturn('Net_SFTP');
         $mock->shouldReceive('isConnected')->andReturn(true);
         $mock->shouldReceive('disconnect');
@@ -419,7 +419,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
      */
     public function testIsNotConnected($filesystem, SftpAdapter $adapter)
     {
-        $mock = Mockery::mock('Net_SFTP');
+        $mock = Mockery::mock('phpseclib\Net\SFTP');
         $mock->shouldReceive('__toString')->andReturn('Net_SFTP');
         $mock->shouldReceive('disconnect');
         $mock->shouldReceive('isConnected')->andReturn(false);
