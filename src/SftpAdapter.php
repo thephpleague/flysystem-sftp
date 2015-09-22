@@ -207,7 +207,7 @@ class SftpAdapter extends AbstractFtpAdapter
             $path = empty($directory) ? $filename : ($directory.'/'.$filename);
             $result[] = $this->normalizeListingObject($path, $object);
 
-            if ($recursive && $object['type'] === SFTP_TYPE_DIRECTORY) {
+            if ($recursive && $object['type'] === NET_SFTP_TYPE_DIRECTORY) {
                 $result = array_merge($result, $this->listDirectoryContents($path));
             }
         }
