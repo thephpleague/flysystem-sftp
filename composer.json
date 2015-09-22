@@ -1,5 +1,5 @@
 {
-    "name": "andreybolonin/flysystem-sftp",
+    "name": "league/flysystem-sftp",
     "description": "Flysystem adapter for SFTP",
     "license": "MIT",
     "authors": [
