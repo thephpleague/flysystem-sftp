@@ -17,7 +17,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function adapterProvider()
     {
         $adapter = new Sftp(['username' => 'test', 'password' => 'test']);
-        $mock = Mockery::mock('Net_SFTP');
+        $mock = Mockery::mock('phpseclib\Net\SFTP');
         $mock->shouldReceive('__toString')->andReturn('Net_SFTP');
         $mock->shouldReceive('isConnected')->andReturn(true);
         $mock->shouldReceive('disconnect');
@@ -342,7 +342,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
     {
         $key = 'private.key';
         $this->assertEquals($adapter, $adapter->setPrivateKey($key));
-        $this->assertInstanceOf('Crypt_RSA', $adapter->getPrivateKey());
+        $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getPrivateKey());
     }
 
     /**
@@ -352,7 +352,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
     {
         file_put_contents($key = __DIR__.'/some.key', 'key contents');
         $this->assertEquals($adapter, $adapter->setPrivateKey($key));
-        $this->assertInstanceOf('Crypt_RSA', $adapter->getPrivateKey());
+        $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getPrivateKey());
         @unlink($key);
     }
 
@@ -383,7 +383,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
     {
         $key = 'private.key';
         $this->assertEquals($adapter, $adapter->setPrivateKey($key));
-        $this->assertInstanceOf('Crypt_RSA', $adapter->getPassword());
+        $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getPassword());
     }
 
     /**
@@ -419,7 +419,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
      */
     public function testIsNotConnected($filesystem, SftpAdapter $adapter)
     {
-        $mock = Mockery::mock('Net_SFTP');
+        $mock = Mockery::mock('phpseclib\Net\SFTP');
         $mock->shouldReceive('__toString')->andReturn('Net_SFTP');
         $mock->shouldReceive('disconnect');
         $mock->shouldReceive('isConnected')->andReturn(false);

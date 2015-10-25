@@ -2,7 +2,6 @@
 
 namespace League\Flysystem\Sftp;
 
-use Crypt_RSA;
 use InvalidArgumentException;
 use League\Flysystem\Adapter\AbstractFtpAdapter;
 use League\Flysystem\Adapter\Polyfill\StreamedCopyTrait;
@@ -10,7 +9,8 @@ use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
 use LogicException;
-use Net_SFTP;
+use phpseclib\Net\SFTP;
+use phpseclib\Crypt\RSA;
 use RuntimeException;
 
 class SftpAdapter extends AbstractFtpAdapter
@@ -93,13 +93,13 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * Inject the Net_SFTP instance.
+     * Inject the SFTP instance.
      *
-     * @param Net_SFTP $connection
+     * @param SFTP $connection
      *
      * @return $this
      */
-    public function setNetSftpConnection(Net_SFTP $connection)
+    public function setNetSftpConnection(SFTP $connection)
     {
         $this->connection = $connection;
 
@@ -111,7 +111,7 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     public function connect()
     {
-        $this->connection = $this->connection ?: new Net_SFTP($this->host, $this->port, $this->timeout);
+        $this->connection = $this->connection ?: new SFTP($this->host, $this->port, $this->timeout);
         $this->login();
         $this->setConnectionRoot();
     }
@@ -147,7 +147,7 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * Get the password, either the private key or a plain text password.
      *
-     * @return Crypt_RSA|string
+     * @return RSA|string
      */
     public function getPassword()
     {
@@ -161,7 +161,7 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * Get the private get with the password or private key contents.
      *
-     * @return Crypt_RSA
+     * @return RSA
      */
     public function getPrivateKey()
     {
@@ -169,7 +169,7 @@ class SftpAdapter extends AbstractFtpAdapter
             $this->privatekey = file_get_contents($this->privatekey);
         }
 
-        $key = new Crypt_RSA();
+        $key = new RSA();
 
         if ($this->password) {
             $key->setPassword($this->password);
@@ -285,7 +285,7 @@ class SftpAdapter extends AbstractFtpAdapter
         $this->ensureDirectory(Util::dirname($path));
         $config = Util::ensureConfig($config);
 
-        if (! $connection->put($path, $contents, NET_SFTP_STRING)) {
+        if (! $connection->put($path, $contents, SFTP::SOURCE_STRING)) {
             return false;
         }
 
@@ -466,7 +466,7 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     public function isConnected()
     {
-        if ($this->connection instanceof Net_SFTP && $this->connection->isConnected()) {
+        if ($this->connection instanceof SFTP && $this->connection->isConnected()) {
             return true;
         }
 
