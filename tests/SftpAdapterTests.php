@@ -4,7 +4,6 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Sftp\SftpAdapter as Sftp;
 use League\Flysystem\Sftp\SftpAdapter;
-use phpseclib\Net\SFTP as SFTPConnection;
 
 class SftpTests extends PHPUnit_Framework_TestCase
 {
@@ -489,7 +488,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
     public function testNetSftpConnectionSetter()
     {
         $settings = [
-            'NetSftpConnection' => $mock = Mockery::mock(SFTPConnection::class),
+            'NetSftpConnection' => $mock = Mockery::mock('phpseclib\Net\SFTP'),
         ];
 
         $mock->shouldReceive('isConnected')->andReturn(true);
