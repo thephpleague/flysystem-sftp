@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.8 - 2015-12-08
+
+### Fixed
+
+* Added .gitattributes for smaller distributions.
+
 ## 1.0.7 - 2015-01-25
 
 ### Fixed
