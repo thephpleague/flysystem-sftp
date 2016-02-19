@@ -166,7 +166,7 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     public function getPrivateKey()
     {
-        if (is_file($this->privatekey)) {
+        if (@is_file($this->privatekey)) {
             $this->privatekey = file_get_contents($this->privatekey);
         }
 
