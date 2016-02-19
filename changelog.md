@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.9 - 2016-02-19
+
+### Fixed
+
+* The absolute path is now stores for better external referencing.
+* When a private key is given is ca no longer trigger a warning with an open basedir restriction.
+
 ## 1.0.8 - 2015-12-08
 
 ### Fixed

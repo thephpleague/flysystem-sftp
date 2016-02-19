@@ -142,7 +142,7 @@ class SftpAdapter extends AbstractFtpAdapter
         if (! $this->connection->chdir($root)) {
             throw new RuntimeException('Root is invalid or does not exist: '.$root);
         }
-        $this->root = $this->connection->pwd();
+        $this->root = $this->connection->pwd() . $this->separator;
     }
 
     /**
