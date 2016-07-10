@@ -4,6 +4,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Sftp\SftpAdapter as Sftp;
 use League\Flysystem\Sftp\SftpAdapter;
+use phpseclib\System\SSH\Agent;
 
 class SftpTests extends PHPUnit_Framework_TestCase
 {
@@ -343,6 +344,23 @@ class SftpTests extends PHPUnit_Framework_TestCase
         $key = 'private.key';
         $this->assertEquals($adapter, $adapter->setPrivateKey($key));
         $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getPrivateKey());
+    }
+
+    /**
+     * @dataProvider  adapterProvider
+     */
+    public function testAgentSetGet($filesystem, $adapter, $mock)
+    {
+        if (!isset($_SERVER['SSH_AUTH_SOCK'])) {
+            $this->markTestSkipped('This test requires an SSH Agent (SSH_AUTH_SOCK env variable).');
+        }
+
+        $this->assertEquals($adapter, $adapter->setAgent(true));
+        $this->assertInstanceOf('phpseclib\System\SSH\Agent', $adapter->getAgent());
+        $this->assertSame($adapter->getAgent(), $adapter->getAgent());
+
+        $this->assertEquals($adapter, $adapter->setAgent(false));
+        $this->assertFalse($adapter->getAgent());
     }
 
     /**

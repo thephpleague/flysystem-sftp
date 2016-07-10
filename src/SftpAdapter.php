@@ -11,6 +11,7 @@ use League\Flysystem\Util;
 use LogicException;
 use phpseclib\Net\SFTP;
 use phpseclib\Crypt\RSA;
+use phpseclib\System\SSH\Agent;
 use RuntimeException;
 
 class SftpAdapter extends AbstractFtpAdapter
@@ -28,9 +29,14 @@ class SftpAdapter extends AbstractFtpAdapter
     protected $privatekey;
 
     /**
+     * @var bool
+     */
+    protected $agent;
+
+    /**
      * @var array
      */
-    protected $configurable = ['host', 'port', 'username', 'password', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic', 'directoryPerm', 'NetSftpConnection'];
+    protected $configurable = ['host', 'port', 'username', 'password', 'agent', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic', 'directoryPerm', 'NetSftpConnection'];
 
     /**
      * @var array
@@ -64,6 +70,18 @@ class SftpAdapter extends AbstractFtpAdapter
     public function setPrivateKey($key)
     {
         $this->privatekey = $key;
+
+        return $this;
+    }
+
+    /**
+     * @param boolean $agent
+     *
+     * @return $this
+     */
+    public function setAgent($agent)
+    {
+        $this->agent = (bool) $agent;
 
         return $this;
     }
@@ -123,8 +141,13 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     protected function login()
     {
-        if (! $this->connection->login($this->username, $this->getPassword())) {
+        $authentication = $this->getPassword();
+        if (! $this->connection->login($this->username, $authentication)) {
             throw new LogicException('Could not login with username: '.$this->username.', host: '.$this->host);
+        }
+
+        if ($authentication instanceof Agent) {
+            $authentication->startSSHForwarding($this->connection);
         }
     }
 
@@ -148,10 +171,14 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * Get the password, either the private key or a plain text password.
      *
-     * @return RSA|string
+     * @return Agent|RSA|string
      */
     public function getPassword()
     {
+        if ($this->agent) {
+            return $this->getAgent();
+        }
+
         if ($this->privatekey) {
             return $this->getPrivateKey();
         }
@@ -179,6 +206,18 @@ class SftpAdapter extends AbstractFtpAdapter
         $key->loadKey($this->privatekey);
 
         return $key;
+    }
+
+    /**
+     * @return Agent|bool
+     */
+    public function getAgent()
+    {
+        if ($this->agent === true) {
+            $this->agent = new Agent();
+        }
+
+        return $this->agent;
     }
 
     /**
