@@ -400,6 +400,10 @@ class SftpTests extends PHPUnit_Framework_TestCase
      */
     public function testConnectWithAgent($filesystem, SftpAdapter $adapter, $mock)
     {
+        if (!isset($_SERVER['SSH_AUTH_SOCK'])) {
+            $this->markTestSkipped('This test requires an SSH Agent (SSH_AUTH_SOCK env variable).');
+        }
+
         $agent = new Agent;
         $adapter->setUseAgent(true);
         $adapter->setAgent($agent);
