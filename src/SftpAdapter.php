@@ -31,12 +31,17 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * @var bool
      */
-    protected $agent;
+    protected $useAgent = false;
+
+    /**
+     * @var Agent
+     */
+    private $agent;
 
     /**
      * @var array
      */
-    protected $configurable = ['host', 'port', 'username', 'password', 'agent', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic', 'directoryPerm', 'NetSftpConnection'];
+    protected $configurable = ['host', 'port', 'username', 'password', 'useAgent', 'agent', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic', 'directoryPerm', 'NetSftpConnection'];
 
     /**
      * @var array
@@ -75,13 +80,25 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * @param boolean $agent
+     * @param boolean $useAgent
      *
      * @return $this
      */
-    public function setAgent($agent)
+    public function setUseAgent($useAgent)
     {
-        $this->agent = (bool) $agent;
+        $this->useAgent = (bool) $useAgent;
+
+        return $this;
+    }
+
+    /**
+     * @param Agent $agent
+     *
+     * @return $this
+     */
+    public function setAgent(Agent $agent)
+    {
+        $this->agent = $agent;
 
         return $this;
     }
@@ -141,7 +158,8 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     protected function login()
     {
-        $authentication = $this->getPassword();
+        $authentication = $this->getAuthentication();
+
         if (! $this->connection->login($this->username, $authentication)) {
             throw new LogicException('Could not login with username: '.$this->username.', host: '.$this->host);
         }
@@ -173,9 +191,9 @@ class SftpAdapter extends AbstractFtpAdapter
      *
      * @return Agent|RSA|string
      */
-    public function getPassword()
+    public function getAuthentication()
     {
-        if ($this->agent) {
+        if ($this->useAgent) {
             return $this->getAgent();
         }
 
@@ -183,6 +201,16 @@ class SftpAdapter extends AbstractFtpAdapter
             return $this->getPrivateKey();
         }
 
+        return $this->getPassword();
+    }
+
+    /**
+     * Get the password, a plain text password.
+     *
+     * @return string
+     */
+    public function getPassword()
+    {
         return $this->password;
     }
 
@@ -213,7 +241,7 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     public function getAgent()
     {
-        if ($this->agent === true) {
+        if ( ! $this->agent instanceof Agent) {
             $this->agent = new Agent();
         }
 

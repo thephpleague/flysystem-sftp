@@ -349,18 +349,19 @@ class SftpTests extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider  adapterProvider
      */
-    public function testAgentSetGet($filesystem, $adapter, $mock)
+    public function testAgentSetGet($filesystem, SftpAdapter $adapter, $mock)
     {
         if (!isset($_SERVER['SSH_AUTH_SOCK'])) {
             $this->markTestSkipped('This test requires an SSH Agent (SSH_AUTH_SOCK env variable).');
         }
 
-        $this->assertEquals($adapter, $adapter->setAgent(true));
-        $this->assertInstanceOf('phpseclib\System\SSH\Agent', $adapter->getAgent());
+        $this->assertEquals($adapter, $adapter->setUseAgent(true));
+        $this->assertInstanceOf('phpseclib\System\SSH\Agent', $adapter->getAuthentication());
         $this->assertSame($adapter->getAgent(), $adapter->getAgent());
 
-        $this->assertEquals($adapter, $adapter->setAgent(false));
-        $this->assertFalse($adapter->getAgent());
+        $agent = new Agent;
+        $adapter->setAgent($agent);
+        $this->assertEquals($agent, $agent);
     }
 
     /**
@@ -397,11 +398,25 @@ class SftpTests extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider  adapterProvider
      */
-    public function testGetPasswordWithKey($filesystem, $adapter, $mock)
+    public function testConnectWithAgent($filesystem, SftpAdapter $adapter, $mock)
+    {
+        $agent = new Agent;
+        $adapter->setUseAgent(true);
+        $adapter->setAgent($agent);
+        $adapter->setNetSftpConnection($mock);
+        $mock->shouldReceive('login')->with('test', $agent)->andReturn(true);
+        $adapter->connect();
+        $this->assertEquals(Agent::FORWARD_REQUEST, $agent->forward_status);
+    }
+
+    /**
+     * @dataProvider  adapterProvider
+     */
+    public function testGetPasswordWithKey($filesystem, SftpAdapter $adapter, $mock)
     {
         $key = 'private.key';
         $this->assertEquals($adapter, $adapter->setPrivateKey($key));
-        $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getPassword());
+        $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getAuthentication());
     }
 
     /**
