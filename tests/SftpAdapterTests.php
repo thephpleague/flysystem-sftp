@@ -563,6 +563,30 @@ class SftpTests extends PHPUnit_Framework_TestCase
         $adapter->connect();
     }
 
+    public function testHostFingerprintNotIsVerifiedIfNotProvided ()
+    {
+        $adapter = new SftpAdapter([
+            'host' => 'example.org',
+            'username' => 'user',
+            'password' => '123456',
+        ]);
+
+        $connection = Mockery::mock('phpseclib\Net\SFTP');
+
+        $connection->shouldReceive('getServerPublicHostKey')
+            ->never();
+
+        $connection->shouldReceive('login')
+            ->with('user', '123456')
+            ->andReturn(TRUE);
+
+        $connection->shouldReceive('disconnect');
+
+        $adapter->setNetSftpConnection($connection);
+
+        $adapter->connect();
+    }
+
     /**
      * @expectedException LogicException
      * @expectedExceptionMessage The authenticity of host example.org can't be established.
