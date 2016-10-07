@@ -304,7 +304,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider  adapterProvider
      */
-    public function testReadStream($filesystem, $adapter, $mock)
+    public function testReadStream($filesystem, SftpAdapter $adapter, $mock)
     {
         $stream = tmpfile();
         fwrite($stream, 'something');
@@ -320,7 +320,7 @@ class SftpTests extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider  adapterProvider
      */
-    public function testGetMimetype($filesystem, $adapter, $mock)
+    public function testGetMimetype($filesystem, SftpAdapter $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
             'type'        => 1,
@@ -339,16 +339,6 @@ class SftpTests extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider  adapterProvider
      */
-    public function testPrivateKeySetGet($filesystem, $adapter, $mock)
-    {
-        $key = 'private.key';
-        $this->assertEquals($adapter, $adapter->setPrivateKey($key));
-        $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getPrivateKey());
-    }
-
-    /**
-     * @dataProvider  adapterProvider
-     */
     public function testAgentSetGet($filesystem, SftpAdapter $adapter, $mock)
     {
         if (!isset($_SERVER['SSH_AUTH_SOCK'])) {
@@ -356,23 +346,11 @@ class SftpTests extends PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals($adapter, $adapter->setUseAgent(true));
-        $this->assertInstanceOf('phpseclib\System\SSH\Agent', $adapter->getAuthentication());
         $this->assertSame($adapter->getAgent(), $adapter->getAgent());
 
         $agent = new Agent;
         $adapter->setAgent($agent);
         $this->assertEquals($agent, $agent);
-    }
-
-    /**
-     * @dataProvider  adapterProvider
-     */
-    public function testPrivateKeyFileSetGet($filesystem, $adapter, $mock)
-    {
-        file_put_contents($key = __DIR__.'/some.key', 'key contents');
-        $this->assertEquals($adapter, $adapter->setPrivateKey($key));
-        $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getPrivateKey());
-        @unlink($key);
     }
 
     /**
@@ -415,23 +393,19 @@ class SftpTests extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider  adapterProvider
-     */
-    public function testGetPasswordWithKey($filesystem, SftpAdapter $adapter, $mock)
-    {
-        $key = 'private.key';
-        $this->assertEquals($adapter, $adapter->setPrivateKey($key));
-        $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getAuthentication());
-    }
-
-    /**
-     * @dataProvider  adapterProvider
      * @expectedException LogicException
      */
-    public function testLoginFail($filesystem, $adapter, $mock)
+    public function testLoginFail($filesystem, SftpAdapter $adapter, $mock)
     {
         $adapter->setNetSftpConnection($mock);
         $mock->shouldReceive('login')->with('test', 'test')->andReturn(false);
-        $adapter->connect();
+        try {
+            $adapter->connect();
+        }
+        catch (LogicException $e) {
+            $this->assertNull($adapter->getPassword(), 'Password should be cleaned from memory');
+            throw $e;
+        }
     }
 
     /**
@@ -532,6 +506,6 @@ class SftpTests extends PHPUnit_Framework_TestCase
         $mock->shouldReceive('disconnect');
 
         $adapter = new Sftp($settings);
-        $this->assertEquals($mock, $adapter->getConnection());
+        $this->assertSame($mock, $adapter->getConnection());
     }
 }
