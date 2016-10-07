@@ -26,6 +26,11 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * @var string
      */
+    protected $hostFingerprint;
+
+    /**
+     * @var string
+     */
     protected $privatekey;
 
     /**
@@ -41,7 +46,7 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * @var array
      */
-    protected $configurable = ['host', 'port', 'username', 'password', 'useAgent', 'agent', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic', 'directoryPerm', 'NetSftpConnection'];
+    protected $configurable = ['host', 'hostFingerprint', 'port', 'username', 'password', 'useAgent', 'agent', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic', 'directoryPerm', 'NetSftpConnection'];
 
     /**
      * @var array
@@ -63,6 +68,23 @@ class SftpAdapter extends AbstractFtpAdapter
     protected function prefix($path)
     {
         return $this->root.ltrim($path, $this->separator);
+    }
+
+    /**
+     * Set the finger print of the public key of the host you are connecting to.
+     *
+     * If the key does not match the server identification, the connection will
+     * be aborted.
+     *
+     * @param string $fingerprint Example: '88:76:75:96:c1:26:7c:dd:9f:87:50:db:ac:c4:a8:7c'.
+     *
+     * @return $this
+     */
+    public function setHostFingerprint($fingerprint)
+    {
+        $this->hostFingerprint = $fingerprint;
+
+        return $this;
     }
 
     /**
@@ -158,6 +180,14 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     protected function login()
     {
+        if ($this->hostFingerprint) {
+            $actualFingerprint = $this->getHexFingerprintFromSshPublicKey($this->connection->getServerPublicHostKey());
+
+            if (0 !== strcasecmp($this->hostFingerprint, $actualFingerprint)) {
+                throw new LogicException('The authenticity of host '.$this->host.' can\'t be established.');
+            }
+        }
+
         $authentication = $this->getAuthentication();
 
         if (! $this->connection->login($this->username, $authentication)) {
@@ -167,6 +197,18 @@ class SftpAdapter extends AbstractFtpAdapter
         if ($authentication instanceof Agent) {
             $authentication->startSSHForwarding($this->connection);
         }
+    }
+
+    /**
+     * Convert the SSH RSA public key into a hex formatted fingerprint.
+     *
+     * @param string $publickey
+     * @return string Hex formatted fingerprint, e.g. '88:76:75:96:c1:26:7c:dd:9f:87:50:db:ac:c4:a8:7c'.
+     */
+    private function getHexFingerprintFromSshPublicKey ($publickey)
+    {
+        $content = explode(' ', $publickey, 3);
+        return implode(':', str_split(md5(base64_decode($content[1])), 2));
     }
 
     /**
