@@ -6,9 +6,12 @@ use League\Flysystem\Sftp\SftpAdapter as Sftp;
 use League\Flysystem\Sftp\SftpAdapter;
 use phpseclib\System\SSH\Agent;
 
+/**
+ * @covers \League\Flysystem\Sftp\SftpAdapter<extended>
+ */
 class SftpTests extends PHPUnit_Framework_TestCase
 {
-    public function setup()
+    protected function setup()
     {
         if (! defined('NET_SFTP_TYPE_DIRECTORY')) {
             define('NET_SFTP_TYPE_DIRECTORY', 2);
@@ -533,5 +536,82 @@ class SftpTests extends PHPUnit_Framework_TestCase
 
         $adapter = new Sftp($settings);
         $this->assertEquals($mock, $adapter->getConnection());
+    }
+
+    public function testHostFingerprintIsVerifiedIfProvided ()
+    {
+        $adapter = new SftpAdapter([
+            'host' => 'example.org',
+            'username' => 'user',
+            'password' => '123456',
+            'hostFingerprint' => '88:76:75:96:c1:26:7c:dd:9f:87:50:db:ac:c4:a8:7c',
+        ]);
+
+        $connection = Mockery::mock('phpseclib\Net\SFTP');
+
+        $connection->shouldReceive('getServerPublicHostKey')
+            ->andReturn('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD05PZTxeH6GPDyxLNv7UV05jcK+Y9P8kQnpEZRHOurJVSOB4k6JBXLQtgbffuy8bFYh6mZVx40f5Za0I9mCfPel/xnCu4F1cndZBY3Ww/12rmjYOHie7k9B3h1trJ1mDhXHuiRO6vfy81jMJ9dzJyCwOK9aFGEueQ8WuPMRt9/1g3awi1O0+YZ8gTLtjKbUXLT50/GksiWDFA6DwxjLR7jFEcuPUm/WpBIKMcsbxpjKmTNaCeuoKs9TcpTwg5E311nQfk0oficgyHP/x8m6mNH5q/zOMwaRjyC6LYyBXVJgSKsh7YFf+pRyHFGpWTWKnRKXWG13NLiEKb47SydLe77');
+
+        $connection->shouldReceive('login')
+            ->with('user', '123456')
+            ->andReturn(TRUE);
+
+        $connection->shouldReceive('disconnect');
+
+        $adapter->setNetSftpConnection($connection);
+
+        $adapter->connect();
+    }
+
+    public function testHostFingerprintNotIsVerifiedIfNotProvided ()
+    {
+        $adapter = new SftpAdapter([
+            'host' => 'example.org',
+            'username' => 'user',
+            'password' => '123456',
+        ]);
+
+        $connection = Mockery::mock('phpseclib\Net\SFTP');
+
+        $connection->shouldReceive('getServerPublicHostKey')
+            ->never();
+
+        $connection->shouldReceive('login')
+            ->with('user', '123456')
+            ->andReturn(TRUE);
+
+        $connection->shouldReceive('disconnect');
+
+        $adapter->setNetSftpConnection($connection);
+
+        $adapter->connect();
+    }
+
+    /**
+     * @expectedException LogicException
+     * @expectedExceptionMessage The authenticity of host example.org can't be established.
+     */
+    public function testMisMatchingHostFingerprintAbortsLogin ()
+    {
+        $adapter = new SftpAdapter([
+            'host' => 'example.org',
+            'username' => 'user',
+            'password' => '123456',
+            'hostFingerprint' => '00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00',
+        ]);
+
+        $connection = Mockery::mock('phpseclib\Net\SFTP');
+
+        $connection->shouldReceive('getServerPublicHostKey')
+            ->andReturn('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD05PZTxeH6GPDyxLNv7UV05jcK+Y9P8kQnpEZRHOurJVSOB4k6JBXLQtgbffuy8bFYh6mZVx40f5Za0I9mCfPel/xnCu4F1cndZBY3Ww/12rmjYOHie7k9B3h1trJ1mDhXHuiRO6vfy81jMJ9dzJyCwOK9aFGEueQ8WuPMRt9/1g3awi1O0+YZ8gTLtjKbUXLT50/GksiWDFA6DwxjLR7jFEcuPUm/WpBIKMcsbxpjKmTNaCeuoKs9TcpTwg5E311nQfk0oficgyHP/x8m6mNH5q/zOMwaRjyC6LYyBXVJgSKsh7YFf+pRyHFGpWTWKnRKXWG13NLiEKb47SydLe77');
+
+        $connection->shouldReceive('login')
+            ->never();
+
+        $connection->shouldReceive('disconnect');
+
+        $adapter->setNetSftpConnection($connection);
+
+        $adapter->connect();
     }
 }
