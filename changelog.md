@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.12 - 2016-10-17
+
+### Improved
+
+* This adapter now uses the username/password getters so it uses the safe storage mechanism in the main package (1.0.29)
+
 ## 1.0.11 - 2016-10-17
 
 ### Improved 
