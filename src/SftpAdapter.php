@@ -190,6 +190,13 @@ class SftpAdapter extends AbstractFtpAdapter
 
         $authentication = $this->getAuthentication();
 
+        /*
+         * We no longer need the password or private key. Remove them so that they cannot accidentally be exposed after
+         * login (e.g. when a stacktrace or scope is dumped).
+         */
+        $this->password   = null;
+        $this->privatekey = null;
+
         if (! $this->connection->login($this->username, $authentication)) {
             throw new LogicException('Could not login with username: '.$this->username.', host: '.$this->host);
         }
@@ -233,7 +240,7 @@ class SftpAdapter extends AbstractFtpAdapter
      *
      * @return Agent|RSA|string
      */
-    public function getAuthentication()
+    protected function getAuthentication()
     {
         if ($this->useAgent) {
             return $this->getAgent();
@@ -249,7 +256,10 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * Get the password, a plain text password.
      *
-     * @return string
+     * After login, this method may return null.
+     *
+     * @deprecated
+     * @return string|null
      */
     public function getPassword()
     {
@@ -261,7 +271,7 @@ class SftpAdapter extends AbstractFtpAdapter
      *
      * @return RSA
      */
-    public function getPrivateKey()
+    protected function getPrivateKey()
     {
         if (@is_file($this->privatekey)) {
             $this->privatekey = file_get_contents($this->privatekey);
