@@ -1,6 +1,8 @@
 # Changelog
 
-## 1.0.10 - 2016-10-17
+## 1.0.11 - 2016-10-17
+
+### Improved 
 
 * Added a fingerprint verification.
 
