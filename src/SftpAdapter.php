@@ -190,8 +190,8 @@ class SftpAdapter extends AbstractFtpAdapter
 
         $authentication = $this->getAuthentication();
 
-        if (! $this->connection->login($this->username, $authentication)) {
-            throw new LogicException('Could not login with username: '.$this->username.', host: '.$this->host);
+        if (! $this->connection->login($this->getUsername(), $authentication)) {
+            throw new LogicException('Could not login with username: '.$this->getUsername().', host: '.$this->host);
         }
 
         if ($authentication instanceof Agent) {
@@ -247,16 +247,6 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * Get the password, a plain text password.
-     *
-     * @return string
-     */
-    public function getPassword()
-    {
-        return $this->password;
-    }
-
-    /**
      * Get the private get with the password or private key contents.
      *
      * @return RSA
@@ -269,8 +259,8 @@ class SftpAdapter extends AbstractFtpAdapter
 
         $key = new RSA();
 
-        if ($this->password) {
-            $key->setPassword($this->password);
+        if ($password = $this->getPassword()) {
+            $key->setPassword($password);
         }
 
         $key->loadKey($this->privatekey);
