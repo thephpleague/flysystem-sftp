@@ -307,7 +307,7 @@ class SftpAdapter extends AbstractFtpAdapter
             $path = empty($directory) ? $filename : ($directory.'/'.$filename);
             $result[] = $this->normalizeListingObject($path, $object);
 
-            if ($recursive && $object['type'] === NET_SFTP_TYPE_DIRECTORY) {
+            if ($recursive && isset($object['type']) && $object['type'] === NET_SFTP_TYPE_DIRECTORY) {
                 $result = array_merge($result, $this->listDirectoryContents($path));
             }
         }
@@ -326,7 +326,8 @@ class SftpAdapter extends AbstractFtpAdapter
     protected function normalizeListingObject($path, array $object)
     {
         $permissions = $this->normalizePermissions($object['permissions']);
-        $type = ($object['type'] === 1) ? 'file' : 'dir' ;
+        $type = isset($object['type']) && ($object['type'] === 1) ? 'file' : 'dir' ;
+
         $timestamp = $object['mtime'];
 
         if ($type === 'dir') {
