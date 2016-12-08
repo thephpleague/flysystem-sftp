@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.13 - 2016-12-08
+
+### Fixed
+
+* Undefined index when object type is not defined
+
 ## 1.0.12 - 2016-10-17
 
 ### Improved
