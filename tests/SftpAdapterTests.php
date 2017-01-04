@@ -511,7 +511,6 @@ class SftpTests extends PHPUnit_Framework_TestCase
                         ],
                     'filename' =>
                         [
-                        'type'        => 1,
                         'mtime'       => time(),
                         'size'        => 20,
                         'permissions' => 0777,
