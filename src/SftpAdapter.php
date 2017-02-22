@@ -326,7 +326,7 @@ class SftpAdapter extends AbstractFtpAdapter
     protected function normalizeListingObject($path, array $object)
     {
         $permissions = $this->normalizePermissions($object['permissions']);
-        $type = isset($object['type']) && ($object['type'] === 1) ? 'file' : 'dir' ;
+        $type = isset($object['type']) && ($object['type'] === 2) ?  'dir' : 'file';
 
         $timestamp = $object['mtime'];
 
