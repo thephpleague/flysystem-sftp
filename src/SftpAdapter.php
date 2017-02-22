@@ -385,8 +385,13 @@ class SftpAdapter extends AbstractFtpAdapter
         $connection = $this->getConnection();
         $this->ensureDirectory(Util::dirname($path));
         $config = Util::ensureConfig($config);
+        $mode = SFTP::SOURCE_STRING;
 
-        if (! $connection->put($path, $contents, SFTP::SOURCE_STRING)) {
+        if ($config && $config->has('mode')) {
+            $mode = $config->get('mode');
+        }
+
+        if (! $connection->put($path, $contents, $mode)) {
             return false;
         }
 
