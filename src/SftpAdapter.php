@@ -32,6 +32,16 @@ class SftpAdapter extends AbstractFtpAdapter
      * @var string
      */
     protected $privatekey;
+    
+    /**
+     * @var string
+     */
+    protected $username;
+    
+    /**
+     * @var string
+     */
+    protected $password;
 
     /**
      * @var bool
