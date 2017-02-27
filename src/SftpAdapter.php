@@ -69,6 +69,32 @@ class SftpAdapter extends AbstractFtpAdapter
     {
         return $this->root.ltrim($path, $this->separator);
     }
+    
+    /**
+     * Set the username (string).
+     *
+     * @param string $val
+     *
+     * @return $this
+     */
+    public function setUsername($val) {
+        $this->username = $val;
+        
+        return $this;
+    }
+    
+    /**
+     * Set the password (string).
+     *
+     * @param string $val
+     *
+     * @return $this
+     */
+    public function setPassword($val) {
+        $this->password = $val;
+        
+        return $this;
+    }
 
     /**
      * Set the finger print of the public key of the host you are connecting to.
