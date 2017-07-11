@@ -19,6 +19,11 @@ class SftpAdapter extends AbstractFtpAdapter
     use StreamedCopyTrait;
 
     /**
+     * @var SFTP
+     */
+    protected $connection;
+
+    /**
      * @var int
      */
     protected $port = 22;
