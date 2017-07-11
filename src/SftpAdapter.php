@@ -51,7 +51,7 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * @var array
      */
-    protected $configurable = ['host', 'hostFingerprint', 'port', 'username', 'password', 'useAgent', 'agent', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic', 'directoryPerm', 'NetSftpConnection'];
+    protected $configurable = ['host', 'hostFingerprint', 'port', 'username', 'password', 'useAgent', 'agent', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic', 'directoryPerm', 'NetSftpConnection', 'url'];
 
     /**
      * @var array
@@ -166,6 +166,36 @@ class SftpAdapter extends AbstractFtpAdapter
         $this->connection = $connection;
 
         return $this;
+    }
+
+    /**
+     * Set the url.
+     *
+     * @param string $url
+     *
+     * @return $this
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * get full url from path if url is set.
+     *
+     * @param string path
+     *
+     * @return string
+     */
+    public function getUrl($path)
+    {
+        if (!empty($this->url)) {
+            return rtrim($this->url,'/').'/'.ltrim($path, '/');
+        }
+
+        return $path;
     }
 
     /**
