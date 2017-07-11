@@ -12,12 +12,10 @@ env:
     - PREFER_LOWEST=""
 
 php:
-  - 5.4
   - 5.5
   - 5.6
   - 7.0
   - 7.1
-  - hhvm
 
 before_install:
   - composer self-up
@@ -31,7 +29,7 @@ script:
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
-  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.xml; fi;'
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.xml
 
 matrix:
   fast_finish: true
