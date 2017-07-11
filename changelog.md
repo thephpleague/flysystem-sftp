@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.14 - 2017-07-11
+
+### Fixed
+
+* Prevent private key exposure in php log when open_basedir restriction is in effect.
+
 ## 1.0.13 - 2016-12-08
 
 ### Fixed
