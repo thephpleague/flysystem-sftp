@@ -247,13 +247,13 @@ class SftpAdapter extends AbstractFtpAdapter
     }
 
     /**
-     * Get the private get with the password or private key contents.
+     * Get the private key with the password or private key contents.
      *
      * @return RSA
      */
     public function getPrivateKey()
     {
-        if (@is_file($this->privatekey)) {
+        if ("---" !== substr($this->privatekey, 0, 3) && is_file($this->privatekey)) {
             $this->privatekey = file_get_contents($this->privatekey);
         }
 
