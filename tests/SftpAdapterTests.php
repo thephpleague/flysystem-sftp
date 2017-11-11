@@ -5,11 +5,12 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Sftp\SftpAdapter as Sftp;
 use League\Flysystem\Sftp\SftpAdapter;
 use phpseclib\System\SSH\Agent;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \League\Flysystem\Sftp\SftpAdapter<extended>
  */
-class SftpTests extends PHPUnit_Framework_TestCase
+class SftpTests extends TestCase
 {
     protected function setup()
     {
