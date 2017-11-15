@@ -5,11 +5,12 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Sftp\SftpAdapter as Sftp;
 use League\Flysystem\Sftp\SftpAdapter;
 use phpseclib\System\SSH\Agent;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \League\Flysystem\Sftp\SftpAdapter<extended>
  */
-class SftpTests extends PHPUnit_Framework_TestCase
+class SftpTests extends TestCase
 {
     const SSH_RSA = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD05PZTxeH6GPDyxLNv7UV05jcK+Y9P8kQnpEZRHOurJVSOB4k6JBXLQtgbffuy8bFYh6mZVx40f5Za0I9mCfPel/xnCu4F1cndZBY3Ww/12rmjYOHie7k9B3h1trJ1mDhXHuiRO6vfy81jMJ9dzJyCwOK9aFGEueQ8WuPMRt9/1g3awi1O0+YZ8gTLtjKbUXLT50/GksiWDFA6DwxjLR7jFEcuPUm/WpBIKMcsbxpjKmTNaCeuoKs9TcpTwg5E311nQfk0oficgyHP/x8m6mNH5q/zOMwaRjyC6LYyBXVJgSKsh7YFf+pRyHFGpWTWKnRKXWG13NLiEKb47SydLe77';
 
