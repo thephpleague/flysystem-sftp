@@ -413,7 +413,7 @@ class SftpAdapter extends AbstractFtpAdapter
             return false;
         }
 
-        return compact('contents');
+        return compact('contents', 'path');
     }
 
     /**
@@ -431,7 +431,7 @@ class SftpAdapter extends AbstractFtpAdapter
 
         rewind($stream);
 
-        return compact('stream');
+        return compact('stream', 'path');
     }
 
     /**
