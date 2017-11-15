@@ -9,8 +9,8 @@ use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
 use LogicException;
-use phpseclib\Net\SFTP;
 use phpseclib\Crypt\RSA;
+use phpseclib\Net\SFTP;
 use phpseclib\System\SSH\Agent;
 use RuntimeException;
 
