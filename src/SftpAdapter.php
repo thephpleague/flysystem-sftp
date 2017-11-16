@@ -210,7 +210,7 @@ class SftpAdapter extends AbstractFtpAdapter
      * @param string $publickey
      * @return string Hex formatted fingerprint, e.g. '88:76:75:96:c1:26:7c:dd:9f:87:50:db:ac:c4:a8:7c'.
      */
-    private function getHexFingerprintFromSshPublicKey ($publickey)
+    public function getHexFingerprintFromSshPublicKey ($publickey)
     {
         $content = explode(' ', $publickey, 3);
         return implode(':', str_split(md5(base64_decode($content[1])), 2));
