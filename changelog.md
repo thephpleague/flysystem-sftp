@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.15 - 2017-11-16
+
+### Fixed
+
+* Added missing `path` to read and readStream response.
+* Upgraded phpunit and lost support for php <=5.5
+
 ## 1.0.14 - 2017-07-11
 
 ### Fixed
