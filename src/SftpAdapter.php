@@ -268,7 +268,7 @@ class SftpAdapter extends AbstractFtpAdapter
             $key->setPassword($password);
         }
 
-        $key->loadKey($this->privatekey);
+        $key->load($this->privatekey);
 
         return $key;
     }
