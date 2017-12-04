@@ -63,6 +63,14 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     protected $directoryPerm = 0744;
 
+    protected $progressCallback;
+
+    public function __construct(array $config, $progressCallback = null)
+    {
+        parent::__construct($config);
+        $this->progressCallback = $progressCallback;
+    }
+
     /**
      * Prefix a path.
      *
@@ -385,13 +393,13 @@ class SftpAdapter extends AbstractFtpAdapter
      * @param Config          $config
      * @return bool
      */
-    public function upload($path, $contents, Config $config, $progressCallback = null)
+    public function upload($path, $contents, Config $config)
     {
         $connection = $this->getConnection();
         $this->ensureDirectory(Util::dirname($path));
         $config = Util::ensureConfig($config);
 
-        if (!$connection->put($path, $contents, SFTP::SOURCE_STRING, -1, -1, $progressCallback)) {
+        if (!$connection->put($path, $contents, SFTP::SOURCE_STRING, -1, -1, $this->progressCallback)) {
             return false;
         }
 
