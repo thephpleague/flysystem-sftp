@@ -385,13 +385,13 @@ class SftpAdapter extends AbstractFtpAdapter
      * @param Config          $config
      * @return bool
      */
-    public function upload($path, $contents, Config $config)
+    public function upload($path, $contents, Config $config, $progressCallback = null)
     {
         $connection = $this->getConnection();
         $this->ensureDirectory(Util::dirname($path));
         $config = Util::ensureConfig($config);
 
-        if (! $connection->put($path, $contents, SFTP::SOURCE_STRING)) {
+        if (!$connection->put($path, $contents, SFTP::SOURCE_STRING, -1, -1, $progressCallback)) {
             return false;
         }
 
