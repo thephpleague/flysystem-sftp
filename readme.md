@@ -7,6 +7,7 @@
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 [![Packagist Version](https://img.shields.io/packagist/v/league/flysystem-sftp.svg?style=flat-square)](https://packagist.org/packages/league/flysystem-sftp)
 [![Total Downloads](https://img.shields.io/packagist/dt/league/flysystem-sftp.svg?style=flat-square)](https://packagist.org/packages/league/flysystem-sftp)
+[![Documentation](https://img.shields.io/badge/read-documenation-brightgreen.svg)](https://flysystem.thephpleague.com/adapter/sftp/)
 
 This adapter uses phpseclib to provide a SFTP adapter for Flysystem.
 
@@ -15,6 +16,10 @@ This adapter uses phpseclib to provide a SFTP adapter for Flysystem.
 ```bash
 composer require league/flysystem-sftp
 ```
+
+## Documentation
+
+Full documentation of this adapter can be found [here](https://flysystem.thephpleague.com/adapter/sftp/): https://flysystem.thephpleague.com/adapter/sftp/
 
 ## Usage
 
