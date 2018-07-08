@@ -174,6 +174,7 @@ class SftpAdapter extends AbstractFtpAdapter
     public function connect()
     {
         $this->connection = $this->connection ?: new SFTP($this->host, $this->port, $this->timeout);
+        $this->connection->disableStatCache();
         $this->login();
         $this->setConnectionRoot();
     }

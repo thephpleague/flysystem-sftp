@@ -400,6 +400,7 @@ class SftpTests extends TestCase
     {
         $adapter->setNetSftpConnection($mock);
         $mock->shouldReceive('login')->with('test', 'test')->andReturn(true);
+        $mock->shouldReceive('disableStatCache');
         $adapter->connect();
     }
 
@@ -552,14 +553,12 @@ class SftpTests extends TestCase
         ]);
 
         $connection = Mockery::mock('phpseclib\Net\SFTP');
-
         $connection->shouldReceive('getServerPublicHostKey')
             ->andReturn(self::SSH_RSA);
-
         $connection->shouldReceive('login')
             ->with('user', '123456')
             ->andReturn(TRUE);
-
+        $connection->shouldReceive('disableStatCache');
         $connection->shouldReceive('disconnect');
 
         $adapter->setNetSftpConnection($connection);
@@ -579,13 +578,11 @@ class SftpTests extends TestCase
 
         $connection->shouldReceive('getServerPublicHostKey')
             ->never();
-
         $connection->shouldReceive('login')
             ->with('user', '123456')
             ->andReturn(TRUE);
-
+        $connection->shouldReceive('disableStatCache');
         $connection->shouldReceive('disconnect');
-
         $adapter->setNetSftpConnection($connection);
 
         $adapter->connect();
@@ -612,6 +609,7 @@ class SftpTests extends TestCase
         $connection->shouldReceive('login')
             ->never();
 
+        $connection->shouldReceive('disableStatCache');
         $connection->shouldReceive('disconnect');
 
         $adapter->setNetSftpConnection($connection);
