@@ -1,5 +1,13 @@
 # Changelog
 
+
+
+## 1.0.15 - 2018-07-08
+
+### Altered
+
+* Stat cache is always disabled.
+
 ## 1.0.15 - 2017-11-16
 
 ### Fixed
