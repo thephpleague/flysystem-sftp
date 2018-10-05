@@ -493,7 +493,13 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     public function has($path)
     {
-        return $this->getMetadata($path);
+        // preserve the errors, workaround for not logging error when checking if file exists
+        $errors = $this->getConnection()->getSFTPErrors();
+        $result = $this->getMetadata($path);
+        // restore the errors to the state before the check
+        $this->getConnection()->sftp_errors = $errors;
+
+        return $result;
     }
 
     /**
@@ -543,9 +549,19 @@ class SftpAdapter extends AbstractFtpAdapter
     public function createDir($dirname, Config $config)
     {
         $connection = $this->getConnection();
+        $structure  = explode('/', preg_replace('#/(?=/)|/$#', '', $dirname));
 
-        if (! $connection->mkdir($dirname, $this->directoryPerm, true)) {
-            return false;
+        for ($i = 0; $i < count($structure); $i++) {
+            $path = implode('/', array_slice($structure, 0, $i + 1));
+
+            if ($this->has($path)) {
+                continue;
+            }
+
+            // do not call mkdir recursive, because it will throw warning for the already existing directories
+            if (!$connection->mkdir($path, $this->directoryPerm, false)) {
+                return false;
+            }
         }
 
         return ['path' => $dirname];
