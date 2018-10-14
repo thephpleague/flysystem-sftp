@@ -1,6 +1,8 @@
 # Changelog
 
+## 1.0.17 - 2018-10-14
 
+* Don't return visibility when not in scope
 
 ## 1.0.16 - 2018-07-08
 
