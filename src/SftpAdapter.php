@@ -363,6 +363,8 @@ class SftpAdapter extends AbstractFtpAdapter
             return false;
         }
 
+        $visibility = $this->getVisibility($path);
+        
         return compact('contents', 'visibility', 'path');
     }
 
@@ -375,6 +377,8 @@ class SftpAdapter extends AbstractFtpAdapter
             return false;
         }
 
+        $visibility = $this->getVisibility($path);
+        
         return compact('visibility', 'path');
     }
 
