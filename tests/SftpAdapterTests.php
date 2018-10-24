@@ -633,11 +633,12 @@ class SftpTests extends TestCase
         $connection = Mockery::mock('phpseclib\Net\SFTP');
 
         $connection->shouldReceive('getServerPublicHostKey')
-            ->andReturn(false);
+            ->andReturn(false); // getServerPublicHostKey returns false if it cant connect.
 
         $connection->shouldReceive('login')
             ->never();
 
+        $connection->shouldReceive('disableStatCache');
         $connection->shouldReceive('disconnect');
 
         $adapter->setNetSftpConnection($connection);
