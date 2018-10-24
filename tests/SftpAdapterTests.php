@@ -616,4 +616,32 @@ class SftpTests extends TestCase
 
         $adapter->connect();
     }
+
+    /**
+     * @expectedException LogicException
+     * @expectedExceptionMessage Could not connect to server to verify public key.
+     */
+    public function testCantConnectToCheckHostFingerprintAbortsLogin()
+    {
+        $adapter = new SftpAdapter([
+            'host' => 'example.org',
+            'username' => 'user',
+            'password' => '123456',
+            'hostFingerprint' => '00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00',
+        ]);
+
+        $connection = Mockery::mock('phpseclib\Net\SFTP');
+
+        $connection->shouldReceive('getServerPublicHostKey')
+            ->andReturn(false);
+
+        $connection->shouldReceive('login')
+            ->never();
+
+        $connection->shouldReceive('disconnect');
+
+        $adapter->setNetSftpConnection($connection);
+
+        $adapter->connect();
+    }
 }
