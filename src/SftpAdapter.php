@@ -269,7 +269,9 @@ class SftpAdapter extends AbstractFtpAdapter
             $key->setPassword($password);
         }
 
-        $key->loadKey($this->privatekey);
+        if($key->loadKey($this->privatekey) === false) {
+            throw new LogicException('Cannot load private-key - key malformed or password wrong?');
+        }
 
         return $key;
     }
