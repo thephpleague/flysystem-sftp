@@ -144,6 +144,12 @@ class SftpTests extends TestCase
      */
     public function testSetVisibility($filesystem, $adapter, $mock)
     {
+        $mock->shouldReceive('stat')->andReturn([
+            'type'        => 1, // file
+            'mtime'       => time(),
+            'size'        => 20,
+            'permissions' => 0777,
+        ]);
         $mock->shouldReceive('chmod')->twice()->andReturn(true, false);
         $this->assertTrue($filesystem->setVisibility('something', 'public'));
         $this->assertFalse($filesystem->setVisibility('something', 'public'));
@@ -155,6 +161,12 @@ class SftpTests extends TestCase
      */
     public function testSetVisibilityInvalid($filesystem, $adapter, $mock)
     {
+        $mock->shouldReceive('stat')->andReturn([
+            'type'        => 1, // file
+            'mtime'       => time(),
+            'size'        => 20,
+            'permissions' => 0777,
+        ]);
         $mock->shouldReceive('stat')->once()->andReturn(true);
         $filesystem->setVisibility('something', 'invalid');
     }
