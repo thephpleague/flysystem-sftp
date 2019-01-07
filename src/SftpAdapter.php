@@ -187,7 +187,13 @@ class SftpAdapter extends AbstractFtpAdapter
     protected function login()
     {
         if ($this->hostFingerprint) {
-            $actualFingerprint = $this->getHexFingerprintFromSshPublicKey($this->connection->getServerPublicHostKey());
+            $publicKey = $this->connection->getServerPublicHostKey();
+
+            if ($publicKey === false) {
+                throw new LogicException('Could not connect to server to verify public key.');
+            }
+
+            $actualFingerprint = $this->getHexFingerprintFromSshPublicKey($publicKey);
 
             if (0 !== strcasecmp($this->hostFingerprint, $actualFingerprint)) {
                 throw new LogicException('The authenticity of host '.$this->host.' can\'t be established.');
