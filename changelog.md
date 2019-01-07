@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.18 - 2019-01-07
+
+* Throw an Exception if can't connect to check Host Fingerprint
+
 ## 1.0.17 - 2018-10-14
 
 * Don't return visibility when not in scope
