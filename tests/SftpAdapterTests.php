@@ -657,4 +657,28 @@ class SftpTests extends TestCase
 
         $adapter->connect();
     }
+
+    /**
+     * @dataProvider adapterProvider
+     */
+    public function testListContentsWithZeroNamedDir($filesystem, $adapter, $mock)
+    {
+        $mock
+            ->shouldReceive('rawlist')
+            ->andReturn(
+                [
+                    '0' =>
+                        [
+                            'type'        => NET_SFTP_TYPE_DIRECTORY,
+                            'mtime'       => time(),
+                            'permissions' => 0777,
+                            'filename'    => '0'
+                        ]
+                ]
+            );
+
+        $listing = $filesystem->listContents('');
+        $this->assertInternalType('array', $listing);
+        $this->assertCount(1, $listing);
+    }
 }
