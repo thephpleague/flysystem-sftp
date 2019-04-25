@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.19 - 2019-04-25
+
+* Fixed casing of `privateKey` property
+
 ## 1.0.18 - 2019-01-07
 
 * Throw an Exception if can't connect to check Host Fingerprint
