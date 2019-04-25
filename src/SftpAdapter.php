@@ -36,7 +36,7 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * @var string
      */
-    protected $privatekey;
+    protected $privateKey;
 
     /**
      * @var bool
@@ -101,7 +101,7 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     public function setPrivateKey($key)
     {
-        $this->privatekey = $key;
+        $this->privateKey = $key;
 
         return $this;
     }
@@ -251,7 +251,7 @@ class SftpAdapter extends AbstractFtpAdapter
             return $this->getAgent();
         }
 
-        if ($this->privatekey) {
+        if ($this->privateKey) {
             return $this->getPrivateKey();
         }
 
@@ -265,8 +265,8 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     public function getPrivateKey()
     {
-        if ("---" !== substr($this->privatekey, 0, 3) && is_file($this->privatekey)) {
-            $this->privatekey = file_get_contents($this->privatekey);
+        if ("---" !== substr($this->privateKey, 0, 3) && is_file($this->privateKey)) {
+            $this->privateKey = file_get_contents($this->privateKey);
         }
 
         $key = new RSA();
@@ -275,7 +275,7 @@ class SftpAdapter extends AbstractFtpAdapter
             $key->setPassword($password);
         }
 
-        $key->loadKey($this->privatekey);
+        $key->loadKey($this->privateKey);
 
         return $key;
     }
