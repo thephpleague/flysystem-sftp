@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.20 - 2019-06-07
+
+* From #77 / Bugfix: Directories or files named '0' do not show up in listContents
+
 ## 1.0.19 - 2019-04-25
 
 * Fixed casing of `privateKey` property
