@@ -312,6 +312,8 @@ class SftpAdapter extends AbstractFtpAdapter
         }
 
         foreach ($listing as $filename => $object) {
+            // When directory entries have a numeric filename they are changed to int
+            $filename = (string) $filename;
             if (in_array($filename, ['.', '..'])) {
                 continue;
             }
