@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.21 - 2019-09-19
+
+* Support double authentication (#63)
+* Added marker interface to some exceptions (#86)
+
 ## 1.0.20 - 2019-06-07
 
 * From #77 / Bugfix: Directories or files named '0' do not show up in listContents
