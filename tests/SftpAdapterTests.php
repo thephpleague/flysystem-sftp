@@ -444,6 +444,58 @@ class SftpTests extends TestCase
         $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getAuthentication());
     }
 
+
+    /**
+     * @dataProvider  adapterProvider
+     */
+    public function testPassphraseSetGet($filesystem, SftpAdapter $adapter, $mock)
+    {
+        $passphrase = 'passphrase';
+        $this->assertEquals($adapter, $adapter->setPassphrase($passphrase));
+        $this->assertEquals($passphrase, $adapter->getPassphrase());
+    }
+
+
+    /**
+     * @dataProvider  adapterProvider
+     */
+    public function testPassphraseFallback($filesystem, SftpAdapter $adapter, $mock)
+    {
+        $passphrase = 'passphrase';
+        $this->assertEquals($adapter, $adapter->setPassword($passphrase));
+        $this->assertEquals($passphrase, $adapter->getPassphrase());
+    }
+
+    /**
+     * @dataProvider  adapterProvider
+     */
+    public function testPassphraseAndPasswordFallback($filesystem, SftpAdapter $adapter, $mock)
+    {
+        $passphrase = 'passphrase';
+        $password = 'password';
+        $this->assertEquals($adapter, $adapter->setPassword($password));
+        $this->assertEquals($adapter, $adapter->setPassphrase($passphrase));
+        $this->assertEquals($passphrase, $adapter->getPassphrase());
+        $this->assertEquals($password, $adapter->getPassword());
+    }
+
+
+    /**
+     * @dataProvider  adapterProvider
+     */
+    public function testConnectWithDoubleAuthentication($filesystem, $adapter, $mock)
+    {
+        $adapter->setPrivateKey('private.key');
+        $adapter->setNetSftpConnection($mock);
+
+        $expectedAuths = [$adapter->getPrivateKey(), 'test'];
+        $mock->shouldReceive('login')->with('test', Mockery::on(function($auth) use (&$expectedAuths) {
+            return $auth == array_shift($expectedAuths);
+        }))->twice()->andReturn(false, true);
+
+        $adapter->connect();
+    }
+
     /**
      * @dataProvider  adapterProvider
      * @expectedException LogicException

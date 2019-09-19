@@ -51,7 +51,7 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * @var array
      */
-    protected $configurable = ['host', 'hostFingerprint', 'port', 'username', 'password', 'useAgent', 'agent', 'timeout', 'root', 'privateKey', 'permPrivate', 'permPublic', 'directoryPerm', 'NetSftpConnection'];
+    protected $configurable = ['host', 'hostFingerprint', 'port', 'username', 'password', 'useAgent', 'agent', 'timeout', 'root', 'privateKey', 'passphrase', 'permPrivate', 'permPublic', 'directoryPerm', 'NetSftpConnection'];
 
     /**
      * @var array
@@ -62,6 +62,11 @@ class SftpAdapter extends AbstractFtpAdapter
      * @var int
      */
     protected $directoryPerm = 0744;
+
+    /**
+     * @var string
+     */
+    private $passphrase;
 
     /**
      * Prefix a path.
@@ -102,6 +107,20 @@ class SftpAdapter extends AbstractFtpAdapter
     public function setPrivateKey($key)
     {
         $this->privateKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set the passphrase for the privatekey.
+     *
+     * @param string $passphrase
+     *
+     * @return $this
+     */
+    public function setPassphrase($passphrase)
+    {
+        $this->passphrase = $passphrase;
 
         return $this;
     }
@@ -202,8 +221,14 @@ class SftpAdapter extends AbstractFtpAdapter
 
         $authentication = $this->getAuthentication();
 
+
         if (! $this->connection->login($this->getUsername(), $authentication)) {
-            throw new LogicException('Could not login with username: '.$this->getUsername().', host: '.$this->host);
+
+            //try double authentication, key is already given so now give password
+            if (!$authentication instanceof RSA
+                || ! $this->connection->login($this->getUsername(), $this->getPassword())) {
+                throw new LogicException('Could not login with username: '.$this->getUsername().', host: '.$this->host);
+            }
         }
 
         if ($authentication instanceof Agent) {
@@ -271,13 +296,25 @@ class SftpAdapter extends AbstractFtpAdapter
 
         $key = new RSA();
 
-        if ($password = $this->getPassword()) {
+        if ($password = $this->getPassphrase()) {
             $key->setPassword($password);
         }
 
         $key->loadKey($this->privateKey);
 
         return $key;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassphrase()
+    {
+        if ($this->passphrase === null) {
+            //Added for backward compatibility
+            return $this->getPassword();
+        }
+        return $this->passphrase;
     }
 
     /**

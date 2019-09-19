@@ -33,6 +33,7 @@ $adapter = new SftpAdapter([
     'username' => 'username',
     'password' => 'password',
     'privateKey' => 'path/to/or/contents/of/privatekey',
+    'passphrase' => 'passphrase-for-privateKey',
     'root' => '/path/to/root',
     'timeout' => 10,
     'directoryPerm' => 0755
