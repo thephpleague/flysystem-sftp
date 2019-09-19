@@ -8,11 +8,9 @@ use League\Flysystem\Adapter\Polyfill\StreamedCopyTrait;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
-use LogicException;
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SFTP;
 use phpseclib\System\SSH\Agent;
-use RuntimeException;
 
 class SftpAdapter extends AbstractFtpAdapter
 {
@@ -201,7 +199,7 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * Login.
      *
-     * @throws LogicException
+     * @throws ConnectionErrorException
      */
     protected function login()
     {
@@ -209,13 +207,13 @@ class SftpAdapter extends AbstractFtpAdapter
             $publicKey = $this->connection->getServerPublicHostKey();
 
             if ($publicKey === false) {
-                throw new LogicException('Could not connect to server to verify public key.');
+                throw new ConnectionErrorException('Could not connect to server to verify public key.');
             }
 
             $actualFingerprint = $this->getHexFingerprintFromSshPublicKey($publicKey);
 
             if (0 !== strcasecmp($this->hostFingerprint, $actualFingerprint)) {
-                throw new LogicException('The authenticity of host '.$this->host.' can\'t be established.');
+                throw new ConnectionErrorException('The authenticity of host '.$this->host.' can\'t be established.');
             }
         }
 
@@ -223,11 +221,10 @@ class SftpAdapter extends AbstractFtpAdapter
 
 
         if (! $this->connection->login($this->getUsername(), $authentication)) {
-
-            //try double authentication, key is already given so now give password
+            // try double authentication, key is already given so now give password
             if (!$authentication instanceof RSA
                 || ! $this->connection->login($this->getUsername(), $this->getPassword())) {
-                throw new LogicException('Could not login with username: '.$this->getUsername().', host: '.$this->host);
+                throw new ConnectionErrorException('Could not login with username: '.$this->getUsername().', host: '.$this->host);
             }
         }
 
@@ -250,6 +247,8 @@ class SftpAdapter extends AbstractFtpAdapter
 
     /**
      * Set the connection root.
+     *
+     * @throws InvalidRootException
      */
     protected function setConnectionRoot()
     {
@@ -260,7 +259,7 @@ class SftpAdapter extends AbstractFtpAdapter
         }
 
         if (! $this->connection->chdir($root)) {
-            throw new RuntimeException('Root is invalid or does not exist: '.$root);
+            throw new InvalidRootException('Root is invalid or does not exist: '.$root);
         }
         $this->root = $this->connection->pwd() . $this->separator;
     }
