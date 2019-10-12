@@ -267,22 +267,7 @@ class SftpAdapter extends AbstractFtpAdapter
             throw new InvalidRootException('Root is invalid or does not exist: '.$root);
         }
 
-        $this->root = $this->addSeparator(
-            $this->connection->pwd(),
-            $this->separator
-        );
-    }
-
-    /**
-     * Cap a value with separator where needed.
-     *
-     * @param string $value
-     * @param string $separator
-     * @return string
-     */
-    protected function addSeparator($value, $separator)
-    {
-        return substr($value, -1) === $separator ? $value : $value.$separator;
+        $this->setRoot($this->connection->pwd());
     }
 
     /**
