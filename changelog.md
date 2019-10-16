@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.22 - 2019-10-16
+
+* Trim extra slashes while setting connection root (#93)
+
 ## 1.0.21 - 2019-09-19
 
 * Support double authentication (#63)
