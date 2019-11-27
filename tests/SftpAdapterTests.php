@@ -545,9 +545,39 @@ class SftpTests extends TestCase
         $adapter->setRoot('/root');
         $adapter->setNetSftpConnection($mock);
         $mock->shouldReceive('login')->with('test', 'test')->andReturn(true);
+        $mock->shouldReceive('is_dir')->with('/root/')->andReturn(true);
         $mock->shouldReceive('chdir')->with('/root/')->andReturn(true);
         $adapter->connect();
         $adapter->disconnect();
+    }
+
+    /**
+     * @dataProvider  adapterProvider
+     */
+    public function testConnectWithNotExistedRoot($filesystem, $adapter, $mock)
+    {
+        $adapter->setRoot('/root');
+        $adapter->setNetSftpConnection($mock);
+        $mock->shouldReceive('login')->with('test', 'test')->andReturn(true);
+        $mock->shouldReceive('is_dir')->with('/root/')->andReturn(false);
+        $mock->shouldReceive('mkdir')->with('/root/')->andReturn(true);
+        $mock->shouldReceive('chdir')->with('/root/')->andReturn(true);
+        $adapter->connect();
+        $adapter->disconnect();
+    }
+
+    /**
+     * @dataProvider  adapterProvider
+     * @expectedException RuntimeException
+     */
+    public function testConnectWithNotExistedRootAndCouldNotBeCreated($filesystem, $adapter, $mock)
+    {
+        $adapter->setRoot('/root');
+        $adapter->setNetSftpConnection($mock);
+        $mock->shouldReceive('login')->with('test', 'test')->andReturn(true);
+        $mock->shouldReceive('is_dir')->with('/root/')->andReturn(false);
+        $mock->shouldReceive('mkdir')->with('/root/')->andReturn(false);
+        $adapter->connect();
     }
 
     /**
@@ -559,6 +589,7 @@ class SftpTests extends TestCase
         $adapter->setRoot('/root');
         $adapter->setNetSftpConnection($mock);
         $mock->shouldReceive('login')->with('test', 'test')->andReturn(true);
+        $mock->shouldReceive('is_dir')->with('/root/')->andReturn(true);
         $mock->shouldReceive('chdir')->with('/root/')->andReturn(false);
         $adapter->connect();
     }
