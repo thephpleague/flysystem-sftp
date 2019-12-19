@@ -192,15 +192,17 @@ class SftpTests extends TestCase
             'size'        => 20,
             'permissions' => 0777,
         ]);
+        $mock->shouldReceive('mkdir')->never()->with('.', $adapter->getDirectoryPerm(), true);
 
         $mock->shouldReceive('rename')->andReturn(true);
         $result = $filesystem->rename('old', 'new');
         $this->assertTrue($result);
-        $mock->shouldNotHaveReceived('mkdir');
     }
 
     /**
      * @dataProvider adapterProvider
+     *
+     * @param \Mockery\MockInterface $mock
      */
     public function testRenameCreatesDirectory($filesystem, $adapter, $mock)
     {
@@ -212,11 +214,11 @@ class SftpTests extends TestCase
         ]);
         $mock->shouldReceive('stat')->with('new_dir/file.ext')->andReturn(false);
         $mock->shouldReceive('stat')->with('new_dir')->andReturn(false);
+        $mock->shouldReceive('mkdir')->once()->with('new_dir', $adapter->getDirectoryPerm(), true);
 
         $mock->shouldReceive('rename')->andReturn(true);
         $result = $filesystem->rename('old_dir/file.ext', 'new_dir/file.ext');
         $this->assertTrue($result);
-        $mock->shouldHaveReceived('mkdir');
     }
 
     /**
