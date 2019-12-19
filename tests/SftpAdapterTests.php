@@ -275,6 +275,24 @@ class SftpTests extends TestCase
     /**
      * @dataProvider  adapterProvider
      */
+    public function testGetVisibilityPrivate($filesystem, $adapter, $mock)
+    {
+        $mock->shouldReceive('stat')->andReturn([
+            'type'        => NET_SFTP_TYPE_DIRECTORY,
+            'mtime'       => time(),
+            'size'        => 20,
+            'permissions' => 0700,
+        ]);
+        $result = $adapter->getVisibility(uniqid().'object.ext');
+        $this->assertInternalType('array', $result);
+        $result = $result['visibility'];
+        $this->assertInternalType('string', $result);
+        $this->assertEquals('private', $result);
+    }
+
+    /**
+     * @dataProvider  adapterProvider
+     */
     public function testGetTimestamp($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
