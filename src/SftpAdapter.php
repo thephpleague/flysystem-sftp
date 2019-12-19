@@ -518,6 +518,13 @@ class SftpAdapter extends AbstractFtpAdapter
     {
         $connection = $this->getConnection();
 
+        $dirname = dirname($newpath);
+        $metadata = $this->getMetadata($dirname);
+
+        if ($metadata === false || $metadata['type'] !== 'dir') {
+            $this->createDir($dirname, new Config());
+        }
+
         return $connection->rename($path, $newpath);
     }
 

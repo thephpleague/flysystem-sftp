@@ -18,7 +18,10 @@ class SftpTests extends TestCase
 
     protected function setup()
     {
-        if (! defined('NET_SFTP_TYPE_DIRECTORY')) {
+        if (!defined('NET_SFTP_TYPE_REGULAR')) {
+            define('NET_SFTP_TYPE_REGULAR', 1);
+        }
+        if (!defined('NET_SFTP_TYPE_DIRECTORY')) {
             define('NET_SFTP_TYPE_DIRECTORY', 2);
         }
     }
@@ -44,9 +47,9 @@ class SftpTests extends TestCase
     public function testHas($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => NET_SFTP_TYPE_DIRECTORY,
-            'mtime'       => time(),
-            'size'        => 20,
+            'type' => NET_SFTP_TYPE_DIRECTORY,
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
 
@@ -96,9 +99,9 @@ class SftpTests extends TestCase
     {
         $mock->shouldReceive('delete')->andReturn(true, false);
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => 1,
-            'mtime'       => time(),
-            'size'        => 20,
+            'type' => 1,
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
         $this->assertTrue($filesystem->delete('something'));
@@ -112,9 +115,9 @@ class SftpTests extends TestCase
     {
         $mock->shouldReceive('put')->andReturn(true, false);
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => NET_SFTP_TYPE_DIRECTORY,
-            'mtime'       => time(),
-            'size'        => 20,
+            'type' => NET_SFTP_TYPE_DIRECTORY,
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
         $this->assertTrue($filesystem->update('something', 'something'));
@@ -129,9 +132,9 @@ class SftpTests extends TestCase
         $stream = tmpfile();
         $mock->shouldReceive('put')->andReturn(true, false);
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => NET_SFTP_TYPE_DIRECTORY,
-            'mtime'       => time(),
-            'size'        => 20,
+            'type' => NET_SFTP_TYPE_DIRECTORY,
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
         $this->assertTrue($filesystem->updateStream('something', $stream));
@@ -145,9 +148,9 @@ class SftpTests extends TestCase
     public function testSetVisibility($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => 1, // file
-            'mtime'       => time(),
-            'size'        => 20,
+            'type' => 1, // file
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
         $mock->shouldReceive('chmod')->twice()->andReturn(true, false);
@@ -162,9 +165,9 @@ class SftpTests extends TestCase
     public function testSetVisibilityInvalid($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => 1, // file
-            'mtime'       => time(),
-            'size'        => 20,
+            'type' => 1, // file
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
         $mock->shouldReceive('stat')->once()->andReturn(true);
@@ -176,15 +179,44 @@ class SftpTests extends TestCase
      */
     public function testRename($filesystem, $adapter, $mock)
     {
-        $mock->shouldReceive('stat')->andReturn([
-            'type'        => NET_SFTP_TYPE_DIRECTORY,
-            'mtime'       => time(),
-            'size'        => 20,
+        $mock->shouldReceive('stat')->with('old')->andReturn([
+            'type' => NET_SFTP_TYPE_REGULAR, // file
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
-        ], false);
+        ]);
+        $mock->shouldReceive('stat')->with('old')->andReturn(false);
+        $mock->shouldReceive('stat')->with('.')->andReturn([
+            'type' => NET_SFTP_TYPE_DIRECTORY,
+            'mtime' => time(),
+            'size' => 20,
+            'permissions' => 0777,
+        ]);
+
         $mock->shouldReceive('rename')->andReturn(true);
         $result = $filesystem->rename('old', 'new');
         $this->assertTrue($result);
+        $mock->shouldNotHaveReceived('mkdir');
+    }
+
+    /**
+     * @dataProvider adapterProvider
+     */
+    public function testRenameCreatesDirectory($filesystem, $adapter, $mock)
+    {
+        $mock->shouldReceive('stat')->with('old_dir/file.ext')->andReturn([
+            'type' => NET_SFTP_TYPE_REGULAR, // file
+            'mtime' => time(),
+            'size' => 20,
+            'permissions' => 0777,
+        ]);
+        $mock->shouldReceive('stat')->with('new_dir/file.ext')->andReturn(false);
+        $mock->shouldReceive('stat')->with('new_dir')->andReturn(false);
+
+        $mock->shouldReceive('rename')->andReturn(true);
+        $result = $filesystem->rename('old_dir/file.ext', 'new_dir/file.ext');
+        $this->assertTrue($result);
+        $mock->shouldHaveReceived('mkdir');
     }
 
     /**
@@ -203,19 +235,19 @@ class SftpTests extends TestCase
     public function testListContents($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('rawlist')->andReturn(false, [
-            '.'       => [],
+            '.' => [],
             'dirname' => [
-                'type'        => NET_SFTP_TYPE_DIRECTORY,
-                'mtime'       => time(),
-                'size'        => 20,
+                'type' => NET_SFTP_TYPE_DIRECTORY,
+                'mtime' => time(),
+                'size' => 20,
                 'permissions' => 0777,
             ],
         ], [
-            '..'      => [],
+            '..' => [],
             'dirname' => [
-                'type'        => 1,
-                'mtime'       => time(),
-                'size'        => 20,
+                'type' => 1,
+                'mtime' => time(),
+                'size' => 20,
                 'permissions' => 0777,
             ],
         ]);
@@ -245,12 +277,12 @@ class SftpTests extends TestCase
     public function testMetaMethods($filesystem, $adapter, $mock, $method, $type)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => NET_SFTP_TYPE_DIRECTORY,
-            'mtime'       => time(),
-            'size'        => 20,
+            'type' => NET_SFTP_TYPE_DIRECTORY,
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
-        $result = $filesystem->{$method}(uniqid().'object.ext');
+        $result = $filesystem->{$method}(uniqid() . 'object.ext');
         $this->assertInternalType($type, $result);
     }
 
@@ -260,12 +292,12 @@ class SftpTests extends TestCase
     public function testGetVisibility($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => NET_SFTP_TYPE_DIRECTORY,
-            'mtime'       => time(),
-            'size'        => 20,
+            'type' => NET_SFTP_TYPE_DIRECTORY,
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
-        $result = $adapter->getVisibility(uniqid().'object.ext');
+        $result = $adapter->getVisibility(uniqid() . 'object.ext');
         $this->assertInternalType('array', $result);
         $result = $result['visibility'];
         $this->assertInternalType('string', $result);
@@ -278,9 +310,9 @@ class SftpTests extends TestCase
     public function testGetTimestamp($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => NET_SFTP_TYPE_DIRECTORY,
-            'mtime'       => $time = time(),
-            'size'        => 20,
+            'type' => NET_SFTP_TYPE_DIRECTORY,
+            'mtime' => $time = time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
         $result = $adapter->getTimestamp('object.ext');
@@ -309,9 +341,9 @@ class SftpTests extends TestCase
     public function testRead($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => 1,
-            'mtime'       => time(),
-            'size'        => 20,
+            'type' => 1,
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
         $mock->shouldReceive('get')->andReturn('file contents', false);
@@ -343,9 +375,9 @@ class SftpTests extends TestCase
     public function testGetMimetype($filesystem, $adapter, $mock)
     {
         $mock->shouldReceive('stat')->andReturn([
-            'type'        => 1,
-            'mtime'       => time(),
-            'size'        => 20,
+            'type' => 1,
+            'mtime' => time(),
+            'size' => 20,
             'permissions' => 0777,
         ]);
 
@@ -389,7 +421,7 @@ class SftpTests extends TestCase
      */
     public function testPrivateKeyFileSetGet($filesystem, $adapter, $mock)
     {
-        file_put_contents($key = __DIR__.'/some.key', 'key contents');
+        file_put_contents($key = __DIR__ . '/some.key', 'key contents');
         $this->assertEquals($adapter, $adapter->setPrivateKey($key));
         $this->assertInstanceOf('phpseclib\Crypt\RSA', $adapter->getPrivateKey());
         @unlink($key);
@@ -489,7 +521,7 @@ class SftpTests extends TestCase
         $adapter->setNetSftpConnection($mock);
 
         $expectedAuths = [$adapter->getPrivateKey(), 'test'];
-        $mock->shouldReceive('login')->with('test', Mockery::on(function($auth) use (&$expectedAuths) {
+        $mock->shouldReceive('login')->with('test', Mockery::on(function ($auth) use (&$expectedAuths) {
             return $auth == array_shift($expectedAuths);
         }))->twice()->andReturn(false, true);
 
@@ -574,17 +606,17 @@ class SftpTests extends TestCase
                 [
                     'dirname' =>
                         [
-                        'type'        => NET_SFTP_TYPE_DIRECTORY,
-                        'mtime'       => time(),
-                        'permissions' => 0777,
-                        'filename'    => 'dirname'
+                            'type' => NET_SFTP_TYPE_DIRECTORY,
+                            'mtime' => time(),
+                            'permissions' => 0777,
+                            'filename' => 'dirname'
                         ],
                     'filename' =>
                         [
-                        'mtime'       => time(),
-                        'size'        => 20,
-                        'permissions' => 0777,
-                        'filename'    => 'filename'
+                            'mtime' => time(),
+                            'size' => 20,
+                            'permissions' => 0777,
+                            'filename' => 'filename'
                         ],
                 ]
             );
@@ -607,7 +639,7 @@ class SftpTests extends TestCase
         $this->assertEquals($mock, $adapter->getConnection());
     }
 
-    public function testHostFingerprintIsVerifiedIfProvided ()
+    public function testHostFingerprintIsVerifiedIfProvided()
     {
         $adapter = new SftpAdapter([
             'host' => 'example.org',
@@ -630,7 +662,7 @@ class SftpTests extends TestCase
         $adapter->connect();
     }
 
-    public function testHostFingerprintNotIsVerifiedIfNotProvided ()
+    public function testHostFingerprintNotIsVerifiedIfNotProvided()
     {
         $adapter = new SftpAdapter([
             'host' => 'example.org',
@@ -656,7 +688,7 @@ class SftpTests extends TestCase
      * @expectedException LogicException
      * @expectedExceptionMessage The authenticity of host example.org can't be established.
      */
-    public function testMisMatchingHostFingerprintAbortsLogin ()
+    public function testMisMatchingHostFingerprintAbortsLogin()
     {
         $adapter = new SftpAdapter([
             'host' => 'example.org',
@@ -721,10 +753,10 @@ class SftpTests extends TestCase
                 [
                     '0' =>
                         [
-                            'type'        => NET_SFTP_TYPE_DIRECTORY,
-                            'mtime'       => time(),
+                            'type' => NET_SFTP_TYPE_DIRECTORY,
+                            'mtime' => time(),
                             'permissions' => 0777,
-                            'filename'    => '0'
+                            'filename' => '0'
                         ]
                 ]
             );
