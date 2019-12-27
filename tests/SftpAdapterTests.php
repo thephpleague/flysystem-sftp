@@ -18,6 +18,9 @@ class SftpTests extends TestCase
 
     protected function setup()
     {
+        if (! defined('NET_SFTP_TYPE_REGULAR')) {
+            define('NET_SFTP_TYPE_REGULAR', 1);
+        }
         if (! defined('NET_SFTP_TYPE_DIRECTORY')) {
             define('NET_SFTP_TYPE_DIRECTORY', 2);
         }
@@ -189,6 +192,28 @@ class SftpTests extends TestCase
 
     /**
      * @dataProvider adapterProvider
+     *
+     * @param \Mockery\MockInterface $mock
+     */
+    public function testRenameCreatesDirectory($filesystem, $adapter, $mock)
+    {
+        $mock->shouldReceive('stat')->with('old_dir/file.ext')->andReturn([
+            'type'        => NET_SFTP_TYPE_REGULAR, // file
+            'mtime'       => time(),
+            'size'        => 20,
+            'permissions' => 0777,
+        ]);
+        $mock->shouldReceive('stat')->with('new_dir/file.ext')->andReturn(false);
+        $mock->shouldReceive('stat')->with('new_dir')->andReturn(false);
+        $mock->shouldReceive('mkdir')->once()->with('new_dir', $adapter->getDirectoryPerm(), true);
+
+        $mock->shouldReceive('rename')->andReturn(true);
+        $result = $filesystem->rename('old_dir/file.ext', 'new_dir/file.ext');
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @dataProvider adapterProvider
      */
     public function testDeleteDir($filesystem, $adapter, $mock)
     {
@@ -250,7 +275,7 @@ class SftpTests extends TestCase
             'size'        => 20,
             'permissions' => 0777,
         ]);
-        $result = $filesystem->{$method}(uniqid().'object.ext');
+        $result = $filesystem->{$method}(uniqid() . 'object.ext');
         $this->assertInternalType($type, $result);
     }
 
@@ -265,7 +290,7 @@ class SftpTests extends TestCase
             'size'        => 20,
             'permissions' => 0777,
         ]);
-        $result = $adapter->getVisibility(uniqid().'object.ext');
+        $result = $adapter->getVisibility(uniqid() . 'object.ext');
         $this->assertInternalType('array', $result);
         $result = $result['visibility'];
         $this->assertInternalType('string', $result);
@@ -574,17 +599,17 @@ class SftpTests extends TestCase
                 [
                     'dirname' =>
                         [
-                        'type'        => NET_SFTP_TYPE_DIRECTORY,
-                        'mtime'       => time(),
-                        'permissions' => 0777,
-                        'filename'    => 'dirname'
+                            'type'        => NET_SFTP_TYPE_DIRECTORY,
+                            'mtime'       => time(),
+                            'permissions' => 0777,
+                            'filename'    => 'dirname'
                         ],
                     'filename' =>
                         [
-                        'mtime'       => time(),
-                        'size'        => 20,
-                        'permissions' => 0777,
-                        'filename'    => 'filename'
+                            'mtime'       => time(),
+                            'size'        => 20,
+                            'permissions' => 0777,
+                            'filename'    => 'filename'
                         ],
                 ]
             );
@@ -656,7 +681,7 @@ class SftpTests extends TestCase
      * @expectedException LogicException
      * @expectedExceptionMessage The authenticity of host example.org can't be established.
      */
-    public function testMisMatchingHostFingerprintAbortsLogin ()
+    public function testMisMatchingHostFingerprintAbortsLogin()
     {
         $adapter = new SftpAdapter([
             'host' => 'example.org',
