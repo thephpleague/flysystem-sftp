@@ -179,21 +179,12 @@ class SftpTests extends TestCase
      */
     public function testRename($filesystem, $adapter, $mock)
     {
-        $mock->shouldReceive('stat')->with('old')->andReturn([
-            'type'        => NET_SFTP_TYPE_REGULAR, // file
-            'mtime'       => time(),
-            'size'        => 20,
-            'permissions' => 0777,
-        ]);
-        $mock->shouldReceive('stat')->with('old')->andReturn(false);
-        $mock->shouldReceive('stat')->with('.')->andReturn([
+        $mock->shouldReceive('stat')->andReturn([
             'type'        => NET_SFTP_TYPE_DIRECTORY,
             'mtime'       => time(),
             'size'        => 20,
             'permissions' => 0777,
-        ]);
-        $mock->shouldReceive('mkdir')->never()->with('.', $adapter->getDirectoryPerm(), true);
-
+        ], false);
         $mock->shouldReceive('rename')->andReturn(true);
         $result = $filesystem->rename('old', 'new');
         $this->assertTrue($result);
