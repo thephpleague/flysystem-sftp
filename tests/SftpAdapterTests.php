@@ -733,4 +733,21 @@ class SftpTests extends TestCase
         $this->assertInternalType('array', $listing);
         $this->assertCount(1, $listing);
     }
+
+    /**
+     * @dataProvider adapterProvider
+     */
+    public function testListContentsWithoutMTime($filesystem, $adapter, $mock)
+    {
+        $mock->shouldReceive('rawlist')->andReturn([
+            'dirname' => [
+                'type'        => NET_SFTP_TYPE_DIRECTORY,
+                'size'        => 20,
+                'permissions' => 0777,
+            ],
+        ]);
+        $listing = $adapter->listContents('');
+        $this->assertInternalType('array', $listing);
+        $this->assertCount(1, $listing);
+    }
 }
