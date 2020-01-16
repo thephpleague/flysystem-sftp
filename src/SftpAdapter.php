@@ -384,7 +384,7 @@ class SftpAdapter extends AbstractFtpAdapter
         $permissions = $this->normalizePermissions($object['permissions']);
         $type = isset($object['type']) && ($object['type'] === 2) ?  'dir' : 'file';
 
-        $timestamp = $object['mtime'];
+        $timestamp = (isset($object['mtime'])) ? $object['mtime'] : null;
 
         if ($type === 'dir') {
             return compact('path', 'timestamp', 'type');
