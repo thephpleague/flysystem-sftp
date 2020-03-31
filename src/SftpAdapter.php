@@ -219,23 +219,32 @@ class SftpAdapter extends AbstractFtpAdapter
 
         $authentication = $this->getAuthentication();
 
-
-        if ($this->connection->login($this->getUsername(), $authentication)) {
-            goto past_login;
-        }
-
-        // try double authentication, key is already given so now give password
-        if ($authentication instanceof RSA && $this->connection->login($this->getUsername(), $this->getPassword())) {
-            goto past_login;
-        }
-
-        throw new ConnectionErrorException('Could not login with username: '.$this->getUsername().', host: '.$this->host);
-
-        past_login:
+        $this->attemptLogin($authentication);
 
         if ($authentication instanceof Agent) {
             $authentication->startSSHForwarding($this->connection);
         }
+    }
+
+    /**
+     * Attempt Login
+     * 
+     * @param Agent|RSA|string $authentication
+     * 
+     * @throws ConnectionErrorException
+     */
+    private function attemptLogin($authentication)
+    {
+        if ($this->connection->login($this->getUsername(), $authentication)) {
+            return;
+        }
+
+        // try double authentication, key is already given so now give password
+        if ($authentication instanceof RSA && $this->connection->login($this->getUsername(), $this->getPassword())) {
+            return;
+        }
+
+        throw new ConnectionErrorException('Could not login with username: '.$this->getUsername().', host: '.$this->host);
     }
 
     /**
