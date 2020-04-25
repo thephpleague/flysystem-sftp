@@ -28,7 +28,7 @@ class SftpTests extends TestCase
         $adapter = new Sftp(['username' => 'test', 'password' => 'test']);
         $mock = Mockery::mock('phpseclib\Net\SFTP')->makePartial();
         $mock->shouldReceive('__toString')->andReturn('Net_SFTP');
-        $mock->shouldReceive('isConnected')->andReturn(true);
+        $mock->shouldReceive('ping')->andReturn(true);
         $mock->shouldReceive('disconnect');
         $adapter->setNetSftpConnection($mock);
         $filesystem = new Filesystem($adapter);
@@ -517,7 +517,7 @@ class SftpTests extends TestCase
     public function testIsConnected($filesystem, SftpAdapter $adapter, $mock)
     {
         $adapter->setNetSftpConnection($mock);
-        $mock->shouldReceive('isConnected')->andReturn(true);
+        $mock->shouldReceive('ping')->andReturn(true);
         $this->assertTrue($adapter->isConnected());
     }
 
@@ -532,7 +532,7 @@ class SftpTests extends TestCase
         $mock = Mockery::mock('phpseclib\Net\SFTP');
         $mock->shouldReceive('__toString')->andReturn('Net_SFTP');
         $mock->shouldReceive('disconnect');
-        $mock->shouldReceive('isConnected')->andReturn(false);
+        $mock->shouldReceive('ping')->andReturn(false);
         $adapter->setNetSftpConnection($mock);
         $this->assertFalse($adapter->isConnected());
     }
@@ -600,7 +600,7 @@ class SftpTests extends TestCase
             'NetSftpConnection' => $mock = Mockery::mock('phpseclib\Net\SFTP'),
         ];
 
-        $mock->shouldReceive('isConnected')->andReturn(true);
+        $mock->shouldReceive('ping')->andReturn(true);
         $mock->shouldReceive('disconnect');
 
         $adapter = new Sftp($settings);
