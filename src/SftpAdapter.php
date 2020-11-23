@@ -8,9 +8,9 @@ use League\Flysystem\Adapter\Polyfill\StreamedCopyTrait;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\Util;
-use phpseclib\Crypt\RSA;
-use phpseclib\Net\SFTP;
-use phpseclib\System\SSH\Agent;
+use phpseclib3\Crypt\RSA;
+use phpseclib3\Net\SFTP;
+use phpseclib3\System\SSH\Agent;
 
 class SftpAdapter extends AbstractFtpAdapter
 {
@@ -381,7 +381,7 @@ class SftpAdapter extends AbstractFtpAdapter
      */
     protected function normalizeListingObject($path, array $object)
     {
-        $permissions = $this->normalizePermissions($object['permissions']);
+        $permissions = $this->normalizePermissions($object['mode']);
         $type = isset($object['type']) && ($object['type'] === 2) ?  'dir' : 'file';
 
         $timestamp = $object['mtime'];
@@ -553,7 +553,7 @@ class SftpAdapter extends AbstractFtpAdapter
 
         $result = Util::map($info, $this->statMap);
         $result['type'] = $info['type'] === NET_SFTP_TYPE_DIRECTORY ? 'dir' : 'file';
-        $result['visibility'] = $info['permissions'] & $this->permPublic ? 'public' : 'private';
+        $result['visibility'] = $info['mode'] & $this->permPublic ? 'public' : 'private';
 
         return $result;
     }
