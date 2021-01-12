@@ -1,5 +1,7 @@
 # Changelog
 
+* Updated phpseclib to v3.0.0
+
 ## 1.0.22 - 2019-10-16
 
 * Trim extra slashes while setting connection root (#93)
