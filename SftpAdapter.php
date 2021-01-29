@@ -75,9 +75,10 @@ class SftpAdapter implements FilesystemAdapter
      */
     private function upload(string $path, $contents, Config $config): void
     {
-        $this->ensureParentDirectoryExists($path, $config);
         $connection = $this->connectionProvider->provideConnection();
         $location = $this->prefixer->prefixPath($path);
+
+        $this->ensureParentDirectoryExists($location, $config);
 
         if ( ! $connection->put($location, $contents, SFTP::SOURCE_STRING)) {
             throw UnableToWriteFile::atLocation($path, 'not able to write the file');
