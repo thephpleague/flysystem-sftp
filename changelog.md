@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0 - 2022-01-04
+
+### Added
+
+* Added `usePingForConnectivityCheck` flag to use `->ping()` for connectivity checks.
+
 ## 1.0.22 - 2019-10-16
 
 * Trim extra slashes while setting connection root (#93)
