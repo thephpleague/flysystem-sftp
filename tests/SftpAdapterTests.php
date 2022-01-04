@@ -607,7 +607,7 @@ class SftpTests extends TestCase
         $this->assertEquals($mock, $adapter->getConnection());
     }
 
-    public function testHostFingerprintIsVerifiedIfProvided ()
+    public function testHostFingerprintIsVerifiedIfProvided()
     {
         $adapter = new SftpAdapter([
             'host' => 'example.org',
@@ -628,6 +628,35 @@ class SftpTests extends TestCase
         $adapter->setNetSftpConnection($connection);
 
         $adapter->connect();
+    }
+
+    public function testUsingPingForTheConnectivityCheck()
+    {
+        $adapter = new SftpAdapter([
+            'usePingForConnectivityCheck' => true,
+            'host' => 'example.org',
+            'username' => 'user',
+            'password' => '123456',
+            'hostFingerprint' => self::SSH_RSA_FINGERPRINT,
+        ]);
+
+        $connection = Mockery::mock('phpseclib\Net\SFTP');
+        $connection->shouldReceive('getServerPublicHostKey')
+            ->andReturn(self::SSH_RSA);
+        $connection->shouldReceive('login')
+            ->with('user', '123456')
+            ->andReturn(TRUE);
+        $connection->shouldReceive('disableStatCache');
+        $connection->shouldReceive('isConnected')->andReturn(true);
+        $connection->shouldReceive('ping')->andReturn(true, false);
+        $connection->shouldReceive('disconnect');
+
+        $adapter->setNetSftpConnection($connection);
+
+        $adapter->connect();
+
+        self::assertTrue($adapter->isConnected());
+        self::assertFalse($adapter->isConnected());
     }
 
     public function testHostFingerprintNotIsVerifiedIfNotProvided ()
