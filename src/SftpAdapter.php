@@ -64,7 +64,7 @@ class SftpAdapter extends AbstractFtpAdapter
     /**
      * @var int
      */
-    protected $directoryPerm = 0744;
+    protected $directoryPerm = 0700;
 
     /**
      * @var string
