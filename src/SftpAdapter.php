@@ -275,6 +275,10 @@ class SftpAdapter extends AbstractFtpAdapter
             return;
         }
 
+        if (! $this->connection->is_dir($root) && ! $this->connection->mkdir($root)) {
+            throw new \RuntimeException('Root does not exist and could not be created: ' . $root . "\n" . "sftp errors:" . implode(",", $this->connection->getSFTPErrors()));
+        }
+
         if (! $this->connection->chdir($root)) {
             throw new InvalidRootException('Root is invalid or does not exist: '.$root);
         }
